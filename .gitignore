@@ -1,0 +1,11 @@
+*.so
+*.pyc
+.build/
+.venv/
+.idea/
+
+# CMake
+cmake-build-*/
+CMakeFiles/
+*.cmake
+CMakeCache.txt
