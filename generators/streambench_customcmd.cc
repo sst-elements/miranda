@@ -32,7 +32,7 @@ STREAMBenchGenerator_CustomCmd::STREAMBenchGenerator_CustomCmd(ComponentId_t id,
 
 void STREAMBenchGenerator_CustomCmd::build(Params &params) {
 
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("STREAMBenchGenerator_CustomCmd[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -55,39 +55,19 @@ void STREAMBenchGenerator_CustomCmd::build(Params &params) {
 
     i = 0;
 
-    out->verbose(CALL_INFO, 1, 0, "STREAM-N length is %"
-    PRIu64
-    "\n", n);
-    out->verbose(CALL_INFO, 1, 0, "operandwidth       %"
-    PRIu64
-    "\n", reqLength);
-    out->verbose(CALL_INFO, 1, 0, "Start of array a @ 0x%"
-    PRIx64
-    "\n", start_a);
-    out->verbose(CALL_INFO, 1, 0, "Start of array b @ 0x%"
-    PRIx64
-    "\n", start_b);
-    out->verbose(CALL_INFO, 1, 0, "Start of array c @ 0x%"
-    PRIx64
-    "\n", start_c);
-    out->verbose(CALL_INFO, 1, 0, "Array Length:      %"
-    PRIu64
-    " bytes\n", (n * reqLength));
-    out->verbose(CALL_INFO, 1, 0, "Total arrays:      %"
-    PRIu64
-    " bytes\n", (3 * n * reqLength));
-    out->verbose(CALL_INFO, 1, 0, "N-per-generate     %"
-    PRIu64
-    "\n", n_per_call);
+    out->verbose(CALL_INFO, 1, 0, "STREAM-N length is %" PRIu64 "\n", n);
+    out->verbose(CALL_INFO, 1, 0, "operandwidth       %" PRIu64 "\n", reqLength);
+    out->verbose(CALL_INFO, 1, 0, "Start of array a @ 0x%" PRIx64 "\n", start_a);
+    out->verbose(CALL_INFO, 1, 0, "Start of array b @ 0x%" PRIx64 "\n", start_b);
+    out->verbose(CALL_INFO, 1, 0, "Start of array c @ 0x%" PRIx64 "\n", start_c);
+    out->verbose(CALL_INFO, 1, 0, "Array Length:      %" PRIu64 " bytes\n", (n * reqLength));
+    out->verbose(CALL_INFO, 1, 0, "Total arrays:      %" PRIu64 " bytes\n", (3 * n * reqLength));
+    out->verbose(CALL_INFO, 1, 0, "N-per-generate     %" PRIu64 "\n", n_per_call);
     if (custom_write_opcode != 0xFFFF) {
-        out->verbose(CALL_INFO, 1, 0, "Custom WR opcode   %"
-        PRIu32
-        "\n", custom_write_opcode );
+        out->verbose(CALL_INFO, 1, 0, "Custom WR opcode   %" PRIu32 "\n", custom_write_opcode);
     }
     if (custom_read_opcode != 0xFFFF) {
-        out->verbose(CALL_INFO, 1, 0, "Custom RD opcode   %"
-        PRIu32
-        "\n", custom_read_opcode );
+        out->verbose(CALL_INFO, 1, 0, "Custom RD opcode   %" PRIu32 "\n", custom_read_opcode);
     }
 }
 
@@ -97,9 +77,7 @@ STREAMBenchGenerator_CustomCmd::~STREAMBenchGenerator_CustomCmd() {
 
 void STREAMBenchGenerator_CustomCmd::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     for (uint64_t j = 0; j < n_per_call; ++j) {
-        out->verbose(CALL_INFO, 4, 0, "Array index: %"
-        PRIu64
-        "\n", i);
+        out->verbose(CALL_INFO, 4, 0, "Array index: %" PRIu64 "\n", i);
 
         // If we reached our limit then step out of the generation
         if (i == n) {
@@ -112,50 +90,39 @@ void STREAMBenchGenerator_CustomCmd::generate(MirandaRequestQueue<GeneratorReque
 
         if (custom_read_opcode == 0xFFFF) {
             // issue standard read
-            read_b = new MemoryOpRequest(start_b + (i * reqLength),
-                                         reqLength,
-                                         READ);
-            read_c = new MemoryOpRequest(start_c + (i * reqLength),
-                                         reqLength,
-                                         READ);
+            read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
+            read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
         } else {
             // issue custom read
-            read_b = new CustomOpRequest(start_b + (i * reqLength),
-                                         reqLength,
-                                         custom_read_opcode);
-            read_c = new CustomOpRequest(start_c + (i * reqLength),
-                                         reqLength,
-                                         custom_read_opcode);
+            read_b = new CustomOpRequest(start_b + (i * reqLength), reqLength, custom_read_opcode);
+            read_c = new CustomOpRequest(start_c + (i * reqLength), reqLength, custom_read_opcode);
         }
 
         if (custom_write_opcode == 0xFFFF) {
             // issue standard write
-            write_a = new MemoryOpRequest(start_a + (i * reqLength),
-                                          reqLength,
-                                          WRITE);
+            write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
         } else {
             // issue custom write
-            write_a = new CustomOpRequest(start_a + (i * reqLength),
-                                          reqLength,
+            write_a = new CustomOpRequest(start_a + (i * reqLength), reqLength,
                                           custom_write_opcode);
         }
 
         write_a->addDependency(read_b->getRequestID());
         write_a->addDependency(read_c->getRequestID());
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing %s READ request for address %"
-        PRIu64
-        "\n", (custom_read_opcode == 0xFFFF ? "regular" : "custom"), (start_b + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing %s READ request for address %" PRIu64 "\n",
+                     (custom_read_opcode == 0xFFFF ? "regular" : "custom"),
+                     (start_b + (i * reqLength)));
         q->push_back(read_b);
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing %s READ request for address %"
-        PRIu64
-        "\n", (custom_read_opcode == 0xFFFF ? "regular" : "custom"), (start_c + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing %s READ request for address %" PRIu64 "\n",
+                     (custom_read_opcode == 0xFFFF ? "regular" : "custom"),
+                     (start_c + (i * reqLength)));
         q->push_back(read_c);
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing %s WRITE request for address %"
-        PRIu64
-        "\n", (custom_write_opcode == 0xFFFF ? "regular" : "custom"), (start_a + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing %s WRITE request for address %" PRIu64 "\n",
+                     (custom_write_opcode == 0xFFFF ? "regular" : "custom"),
+                     (start_a + (i * reqLength)));
         q->push_back(write_a);
 
         i++;

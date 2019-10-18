@@ -32,7 +32,7 @@ RandomGenerator::RandomGenerator(ComponentId_t id, Params &params) :
 }
 
 void RandomGenerator::build(Params &params) {
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("RandomGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -42,15 +42,9 @@ void RandomGenerator::build(Params &params) {
 
     rng = new MarsagliaRNG(11, 31);
 
-    out->verbose(CALL_INFO, 1, 0, "Will issue %"
-    PRIu64
-    " operations\n", issueCount);
-    out->verbose(CALL_INFO, 1, 0, "Request lengths: %"
-    PRIu64
-    " bytes\n", reqLength);
-    out->verbose(CALL_INFO, 1, 0, "Maximum address: %"
-    PRIu64
-    "\n", maxAddr);
+    out->verbose(CALL_INFO, 1, 0, "Will issue %" PRIu64 " operations\n", issueCount);
+    out->verbose(CALL_INFO, 1, 0, "Request lengths: %" PRIu64 " bytes\n", reqLength);
+    out->verbose(CALL_INFO, 1, 0, "Maximum address: %" PRIu64 "\n", maxAddr);
 
     issueOpFences = params.find<std::string>("issue_op_fences", "yes") == "yes";
 
@@ -62,9 +56,7 @@ RandomGenerator::~RandomGenerator() {
 }
 
 void RandomGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
-    out->verbose(CALL_INFO, 4, 0, "Generating next request number: %"
-    PRIu64
-    "\n", issueCount);
+    out->verbose(CALL_INFO, 4, 0, "Generating next request number: %" PRIu64 "\n", issueCount);
 
     const uint64_t rand_addr = rng->generateNextUInt64();
     // Ensure we have a reqLength aligned request

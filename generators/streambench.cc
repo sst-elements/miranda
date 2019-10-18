@@ -31,7 +31,7 @@ STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params) :
 }
 
 void STREAMBenchGenerator::build(Params &params) {
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("STREAMBenchGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -91,9 +91,9 @@ void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) 
             break;
         }
 
-        MemoryOpRequest *read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
-        MemoryOpRequest *read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
-        MemoryOpRequest *write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
+        auto read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
+        auto read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
+        auto write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
 
         write_a->addDependency(read_b->getRequestID());
         write_a->addDependency(read_c->getRequestID());

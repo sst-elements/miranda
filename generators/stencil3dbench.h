@@ -69,19 +69,19 @@ namespace SST {
             uint32_t convertPositionToIndex(const uint32_t posX,
                                             const uint32_t posY, const uint32_t posZ);
 
-            uint32_t nX;
-            uint32_t nY;
-            uint32_t nZ;
-            uint32_t datawidth;
+            uint32_t nX{};
+            uint32_t nY{};
+            uint32_t nZ{};
+            uint32_t datawidth{};
 
-            uint32_t startZ;
-            uint32_t endZ;
+            uint32_t startZ{};
+            uint32_t endZ{};
 
-            uint32_t currentZ;
-            uint32_t currentItr;
-            uint32_t maxItr;
+            uint32_t currentZ{};
+            uint32_t currentItr{};
+            uint32_t maxItr{};
 
-            Output *out;
+            Output *out{};
 
         };
 

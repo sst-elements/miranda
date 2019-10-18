@@ -34,45 +34,45 @@ namespace SST {
 
             void build(Params &params);
 
-            ~STREAMBenchGenerator();
+            ~STREAMBenchGenerator() override;
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q);
+            void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
 
-            bool isFinished();
+            bool isFinished() override;
 
-            void completed();
+            void completed() override;
 
             SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
                 STREAMBenchGenerator,
-            "miranda",
-            "STREAMBenchGenerator",
-            SST_ELI_ELEMENT_VERSION(1,0,0),
-            "Creates a representation of the STREAM benchmark",
-            SST::Miranda::RequestGenerator
+                "miranda",
+                "STREAMBenchGenerator",
+                SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                "Creates a representation of the STREAM benchmark",
+                SST::Miranda::RequestGenerator
             )
 
             SST_ELI_DOCUMENT_PARAMS(
-            { "verbose", "Sets the verbosity output of the generator", "0" },
-            { "n", "Sets the number of elements in the STREAM arrays", "10000" },
-            { "n_per_call", "Sets the number of iterations to generate per call to the generation function", "1" },
-            { "operandwidth", "Sets the length of the request, default=8 (i.e. one double)", "8" },
-            { "start_a", "Sets the start address of the array a", "0" },
-            { "start_b", "Sets the start address of the array b", "1024" },
-            { "start_c", "Sets the start address of the array c", "2048" }
+                { "verbose", "Sets the verbosity output of the generator", "0" },
+                { "n", "Sets the number of elements in the STREAM arrays", "10000" },
+                { "n_per_call", "Sets the number of iterations to generate per call to the generation function", "1" },
+                { "operandwidth", "Sets the length of the request, default=8 (i.e. one double)", "8" },
+                { "start_a", "Sets the start address of the array a", "0" },
+                { "start_b", "Sets the start address of the array b", "1024" },
+                { "start_c", "Sets the start address of the array c", "2048" }
             )
 
         private:
-            uint64_t reqLength;
+            uint64_t reqLength{};
 
-            uint64_t start_a;
-            uint64_t start_b;
-            uint64_t start_c;
+            uint64_t start_a{};
+            uint64_t start_b{};
+            uint64_t start_c{};
 
-            uint64_t n;
-            uint64_t n_per_call;
-            uint64_t i;
+            uint64_t n{};
+            uint64_t n_per_call{};
+            uint64_t i{};
 
-            Output *out;
+            Output *out{};
 
         };
 

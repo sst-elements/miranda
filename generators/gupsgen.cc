@@ -30,7 +30,7 @@ GUPSGenerator::GUPSGenerator(Component *owner, Params &params) : RequestGenerato
 }
 
 void GUPSGenerator::build(Params &params) {
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("GUPSGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -43,18 +43,10 @@ void GUPSGenerator::build(Params &params) {
     seed_b = params.find<uint64_t>("seed_b", 31);
     rng = new MarsagliaRNG(seed_a, seed_b);
 
-    out->verbose(CALL_INFO, 1, 0, "Will issue %"
-    PRIu64
-    " operations\n", issueCount);
-    out->verbose(CALL_INFO, 1, 0, "Request lengths: %"
-    PRIu64
-    " bytes\n", reqLength);
-    out->verbose(CALL_INFO, 1, 0, "Minimum address: %"
-    PRIu64
-    "\n", memStart);
-    out->verbose(CALL_INFO, 1, 0, "Maximum address: %"
-    PRIu64
-    "\n", memStart + memLength);
+    out->verbose(CALL_INFO, 1, 0, "Will issue %" PRIu64 " operations\n", issueCount);
+    out->verbose(CALL_INFO, 1, 0, "Request lengths: %" PRIu64 " bytes\n", reqLength);
+    out->verbose(CALL_INFO, 1, 0, "Minimum address: %" PRIu64 "\n", memStart);
+    out->verbose(CALL_INFO, 1, 0, "Maximum address: %" PRIu64 "\n", memStart + memLength);
 
     issueOpFences = params.find<std::string>("issue_op_fences", "yes") == "yes";
 }
@@ -73,14 +65,12 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     addr *= reqLength;
     addr += memStart;
 
-    out->verbose(CALL_INFO, 4, 0, "Generating next request number: %"
-    PRIu64
-    " at address %"
-    PRIu64
-    "\n", issueCount, addr);
+    out->verbose(CALL_INFO, 4, 0,
+                 "Generating next request number: %" PRIu64 " at address %" PRIu64 "\n",
+                 issueCount, addr);
 
-    MemoryOpRequest *readAddr = new MemoryOpRequest(addr, reqLength, READ);
-    MemoryOpRequest *writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
+    auto readAddr = new MemoryOpRequest(addr, reqLength, READ);
+    auto writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
 
     writeAddr->addDependency(readAddr->getRequestID());
 

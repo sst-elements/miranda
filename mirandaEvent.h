@@ -17,7 +17,7 @@
 #ifndef _H_SST_MEM_H_REQUEST_GEN_EVENT
 #define _H_SST_MEM_H_REQUEST_GEN_EVENT
 
-#include <stdint.h>
+#include <stdint.h>  // deprecated lib
 #include <sst/core/event.h>
 #include <sst/core/params.h>
 
@@ -33,7 +33,7 @@ namespace SST {
 
             std::deque <std::pair<std::string, SST::Params>> generators;
 
-            uint64_t key;
+            uint64_t key{};
         private:
 
             void serialize_order(SST::Core::Serialization::serializer &ser) override {
@@ -47,7 +47,7 @@ namespace SST {
 
         class MirandaRspEvent : public SST::Event {
         public:
-            uint64_t key;
+            uint64_t key{};
         private:
             void serialize_order(SST::Core::Serialization::serializer &ser) override {
                 Event::serialize_order(ser);

@@ -26,7 +26,7 @@
 using namespace SST::Miranda;
 
 RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params) :
-    Component(id), srcLink(NULL), reqGen(NULL) {
+    Component(id), reqGen(nullptr), srcLink(nullptr) {
 
     const int verbose = params.find<int>("verbose", 0);
     std::stringstream prefix;
@@ -40,17 +40,17 @@ RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params) :
     requestsPending[READ] = requestsPending[WRITE] = requestsPending[CUSTOM] = 0;
 
     out->verbose(CALL_INFO, 1, 0, "Configured CPU to allow %"
-    PRIu32
-    " maximum Load requests to be memory to be outstanding.\n",
-        maxRequestsPending[READ]);
+                                  PRIu32
+                                  " maximum Load requests to be memory to be outstanding.\n",
+                 maxRequestsPending[READ]);
     out->verbose(CALL_INFO, 1, 0, "Configured CPU to allow %"
-    PRIu32
-    " maximum Store requests to be memory to be outstanding.\n",
-        maxRequestsPending[WRITE]);
+                                  PRIu32
+                                  " maximum Store requests to be memory to be outstanding.\n",
+                 maxRequestsPending[WRITE]);
     out->verbose(CALL_INFO, 1, 0, "Configured CPU to allow %"
-    PRIu32
-    " maximum Custom requests to be memory to be outstanding.\n",
-        maxRequestsPending[CUSTOM]);
+                                  PRIu32
+                                  " maximum Custom requests to be memory to be outstanding.\n",
+                 maxRequestsPending[CUSTOM]);
 
     std::string cpuClock = params.find<std::string>("clock", "2GHz");
     clockHandler = new Clock::Handler<RequestGenCPU>(this, &RequestGenCPU::clockTick);
@@ -89,16 +89,16 @@ RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params) :
     out->verbose(CALL_INFO, 1, 0, "Loaded memory interface successfully.\n");
 
     cacheLine = params.find<uint64_t>("cache_line_size", 64);
-    const uint64_t pageSize = params.find<uint64_t>("pagesize", 4096);
-    const uint64_t pageCount = params.find<uint64_t>("pagecount", 4194304);
+    auto pageSize = params.find<uint64_t>("pagesize", 4096);
+    auto pageCount = params.find<uint64_t>("pagecount", 4194304);
 
     if (pageSize % cacheLine > 0) {
         out->fatal(CALL_INFO, -8, "Error: Miranda memory configuration. Page size=%"
-        PRIu64
-        ", is not a multiple of cache line size: %"
-        PRIu64
-        "\n",
-            pageSize, cacheLine);
+                                  PRIu64
+                                  ", is not a multiple of cache line size: %"
+                                  PRIu64
+                                  "\n",
+                   pageSize, cacheLine);
     }
 
     MirandaPageMappingPolicy policy = MirandaPageMappingPolicy::LINEAR;
@@ -132,7 +132,7 @@ RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params) :
             reqGen = loadAnonymousSubComponent<RequestGenerator>(reqGenModName, "generator", 0,
                                                                  ComponentInfo::INSERT_STATS,
                                                                  genParams);
-            if (NULL == reqGen) {
+            if (nullptr == reqGen) {
                 out->fatal(CALL_INFO, -1, "Failed to load generator: %s\n", reqGenModName.c_str());
             } else {
                 out->verbose(CALL_INFO, 1, 0, "Generator loaded successfully.\n");
@@ -146,7 +146,7 @@ RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params) :
             out->verbose(CALL_INFO, 1, 0, "getting generators from a link\n");
             srcLink = configureLink("src", "50ps", new Event::Handler<RequestGenCPU>(this,
                                                                                      &RequestGenCPU::handleSrcEvent));
-            if (NULL == srcLink) {
+            if (nullptr == srcLink) {
                 out->fatal(CALL_INFO, -1, "Failed to configure src link\n");
             }
 
@@ -178,24 +178,24 @@ RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params) :
 
     out->verbose(CALL_INFO, 1, 0, "Miranda CPU Configuration:\n");
     out->verbose(CALL_INFO, 1, 0, "- Max requests per cycle:         %"
-    PRIu32
-    "\n", reqMaxPerCycle);
+                                  PRIu32
+                                  "\n", reqMaxPerCycle);
     out->verbose(CALL_INFO, 1, 0, "- Max reorder lookups             %"
-    PRIu32
-    "\n", maxOpLookup);
+                                  PRIu32
+                                  "\n", maxOpLookup);
     out->verbose(CALL_INFO, 1, 0, "- Clock:                          %s\n", cpuClock.c_str());
     out->verbose(CALL_INFO, 1, 0, "- Cache line size:                %"
-    PRIu64
-    " bytes\n", cacheLine);
+                                  PRIu64
+                                  " bytes\n", cacheLine);
     out->verbose(CALL_INFO, 1, 0, "- Max Load requests pending:      %"
-    PRIu32
-    "\n", maxRequestsPending[READ]);
+                                  PRIu32
+                                  "\n", maxRequestsPending[READ]);
     out->verbose(CALL_INFO, 1, 0, "- Max Store requests pending:     %"
-    PRIu32
-    "\n", maxRequestsPending[WRITE]);
+                                  PRIu32
+                                  "\n", maxRequestsPending[WRITE]);
     out->verbose(CALL_INFO, 1, 0, "- Max Custom requests pending:     %"
-    PRIu32
-    "\n", maxRequestsPending[CUSTOM]);
+                                  PRIu32
+                                  "\n", maxRequestsPending[CUSTOM]);
     out->verbose(CALL_INFO, 1, 0, "Configuration completed.\n");
 }
 
@@ -212,7 +212,7 @@ void RequestGenCPU::init(unsigned int phase) {
 
 void RequestGenCPU::handleSrcEvent(Event *ev) {
 
-    MirandaReqEvent *event = static_cast<MirandaReqEvent *>(ev);
+    auto event = static_cast<MirandaReqEvent *>(ev);
 
     out->verbose(CALL_INFO, 2, 0, "got %lu generators\n", event->generators.size());
     loadGenerator(event);
@@ -240,7 +240,7 @@ void RequestGenCPU::loadGenerator(const std::string &name, SST::Params &params) 
     reqGen = loadAnonymousSubComponent<RequestGenerator>(name, "generator", 0,
                                                          ComponentInfo::SHARE_NONE, params);
 
-    if (NULL == reqGen) {
+    if (nullptr == reqGen) {
         out->fatal(CALL_INFO, -1, "Failed to load generator: %s\n", name.c_str());
     }
 }
@@ -250,26 +250,27 @@ void RequestGenCPU::handleEvent(Interfaces::SimpleMem::Request *ev) {
     out->verbose(CALL_INFO, 2, 0, "Recv event for processing from interface\n");
 
     SimpleMem::Request::id_t reqID = ev->id;
-    std::map<SimpleMem::Request::id_t, CPURequest *>::iterator reqFind = requestsInFlight.find(
+    auto reqFind = requestsInFlight.find(
         reqID);
 
     if (reqFind == requestsInFlight.end()) {
         out->fatal(CALL_INFO, -1, "Unable to find request %"
-        PRIu64
-        " in request map.\n", reqID);
+                                  PRIu64
+                                  " in request map.\n", reqID);
     } else {
         CPURequest *cpuReq = reqFind->second;
 
         out->verbose(CALL_INFO, 4, 0, "Miranda request located ID=%"
-        PRIu64
-        ", contains %"
-        PRIu32
-        " parts, issue time=%"
-        PRIu64
-        ", time now=%"
-        PRIu64
-        "\n",
-            cpuReq->getOriginalReqID(), cpuReq->countParts(), cpuReq->getIssueTime(), getCurrentSimTimeNano());
+                                      PRIu64
+                                      ", contains %"
+                                      PRIu32
+                                      " parts, issue time=%"
+                                      PRIu64
+                                      ", time now=%"
+                                      PRIu64
+                                      "\n",
+                     cpuReq->getOriginalReqID(), cpuReq->countParts(), cpuReq->getIssueTime(),
+                     getCurrentSimTimeNano());
 
         statReqLatency->addData((getCurrentSimTimeNano() - cpuReq->getIssueTime()));
         requestsInFlight.erase(reqFind);
@@ -291,11 +292,12 @@ void RequestGenCPU::handleEvent(Interfaces::SimpleMem::Request *ev) {
         // deletion and update any pending requests which are depending on us
         if (cpuReq->completed()) {
             out->verbose(CALL_INFO, 4, 0, "-> Entry has all parts satisfied, removing ID=%"
-            PRIu64
-            ", total processing time: %"
-            PRIu64
-            "ns\n",
-                cpuReq->getOriginalReqID(), (getCurrentSimTimeNano() - cpuReq->getIssueTime()));
+                                          PRIu64
+                                          ", total processing time: %"
+                                          PRIu64
+                                          "ns\n",
+                         cpuReq->getOriginalReqID(),
+                         (getCurrentSimTimeNano() - cpuReq->getIssueTime()));
 
             // Notify every pending request that there may be a satisfied dependency
             for (uint32_t i = 0; i < pendingRequests.size(); ++i) {
@@ -319,22 +321,22 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
 
     if (!isCustom) {
         out->verbose(CALL_INFO, 4, 0, "Issue request: address=0x%"
-        PRIx64
-        ", length=%"
-        PRIu64
-        ", operation=%s, cache line offset=%"
-        PRIu64
-        "\n",
-            reqAddress, reqLength, (isRead ? "READ" : "WRITE"), lineOffset);
+                                      PRIx64
+                                      ", length=%"
+                                      PRIu64
+                                      ", operation=%s, cache line offset=%"
+                                      PRIu64
+                                      "\n",
+                     reqAddress, reqLength, (isRead ? "READ" : "WRITE"), lineOffset);
     } else {
         out->verbose(CALL_INFO, 4, 0, "Issue request: address=0x%"
-        PRIx64
-        ", length=%"
-        PRIu64
-        ", operation=%s, cache line offset=%"
-        PRIu64
-        "\n",
-            reqAddress, reqLength, "CUSTOM", lineOffset);
+                                      PRIx64
+                                      ", length=%"
+                                      PRIu64
+                                      ", operation=%s, cache line offset=%"
+                                      PRIu64
+                                      "\n",
+                     reqAddress, reqLength, "CUSTOM", lineOffset);
     }
 
     if (statBytes[operation] != nullptr)
@@ -354,23 +356,23 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
 
         out->verbose(CALL_INFO, 4, 0, "Issuing a split cache line operation:\n");
         out->verbose(CALL_INFO, 4, 0, "L -> Address: %"
-        PRIu64
-        ", Length=%"
-        PRIu64
-        "\n",
-            lowerAddress, lowerLength);
+                                      PRIu64
+                                      ", Length=%"
+                                      PRIu64
+                                      "\n",
+                     lowerAddress, lowerLength);
         out->verbose(CALL_INFO, 4, 0, "U -> Address: %"
-        PRIu64
-        ", Length=%"
-        PRIu64
-        "\n",
-            upperAddress, upperLength);
+                                      PRIu64
+                                      ", Length=%"
+                                      PRIu64
+                                      "\n",
+                     upperAddress, upperLength);
 
         SimpleMem::Request *reqLower;
         SimpleMem::Request *reqUpper;
 
         if (isCustom) {
-            CustomOpRequest *creq = static_cast<CustomOpRequest *>(req);
+            auto creq = static_cast<CustomOpRequest *>(req);
             // build a custom request event
             reqLower = new SimpleMem::Request(
                 SimpleMem::Request::CustomCmd,
@@ -390,7 +392,7 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
                 upperAddress, upperLength);
         }
 
-        CPURequest *newCPUReq = new CPURequest(req->getRequestID());
+        auto newCPUReq = new CPURequest(req->getRequestID());
         newCPUReq->incPartCount();
         newCPUReq->incPartCount();
         newCPUReq->setIssueTime(getCurrentSimTimeNano());
@@ -415,7 +417,7 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
         // This is not a split load, i.e. issue in a single transaction
         SimpleMem::Request *request;
         if (isCustom) {
-            CustomOpRequest *creq = static_cast<CustomOpRequest *>(req);
+            auto creq = static_cast<CustomOpRequest *>(req);
             // issue custom request
             request = new SimpleMem::Request(
                 SimpleMem::Request::CustomCmd,
@@ -430,7 +432,7 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
 
         request->setVirtualAddress(memMgr->mapAddress(reqAddress));
 
-        CPURequest *newCPUReq = new CPURequest(req->getRequestID());
+        auto newCPUReq = new CPURequest(req->getRequestID());
         newCPUReq->incPartCount();
         newCPUReq->setIssueTime(getCurrentSimTimeNano());
 
@@ -445,7 +447,7 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
     }
 }
 
-bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
+bool RequestGenCPU::clockTick(SST::Cycle_t) {
 
     if (!reqGen) {
         out->verbose(CALL_INFO, 2, 0, "unregister\n");
@@ -454,7 +456,7 @@ bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
     statCycles->addData(1);
 
     if (reqGen->isFinished()) {
-        if ((pendingRequests.size() == 0) &&
+        if ((pendingRequests.empty()) &&
             (0 == requestsPending[READ]) &&
             (0 == requestsPending[WRITE]) &&
             (0 == requestsPending[CUSTOM])) {
@@ -466,13 +468,13 @@ bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
 
             reqGen->completed();
             delete reqGen;
-            reqGen = NULL;
+            reqGen = nullptr;
 
-            if (NULL == srcLink) {
+            if (nullptr == srcLink) {
                 primaryComponentOKToEndSim();
             } else {
                 if (srcReqEvent->generators.empty()) {
-                    MirandaRspEvent *event = new MirandaRspEvent;
+                    auto event = new MirandaRspEvent;
                     event->key = static_cast<MirandaReqEvent *>(srcReqEvent)->key;
                     delete srcReqEvent;
                     srcLink->send(0, event);
@@ -493,27 +495,27 @@ bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
     // Process the request which may require splitting into multiple
     // requests (if breaks over a cache line)
     out->verbose(CALL_INFO, 2, 0, "Load Requests pending %"
-    PRIu32
-    ", maximum permitted %"
-    PRIu32
-    ".\n",
-        requestsPending[READ], maxRequestsPending[READ]);
+                                  PRIu32
+                                  ", maximum permitted %"
+                                  PRIu32
+                                  ".\n",
+                 requestsPending[READ], maxRequestsPending[READ]);
     out->verbose(CALL_INFO, 2, 0, "Store Requests pending %"
-    PRIu32
-    ", maximum permitted %"
-    PRIu32
-    ".\n",
-        requestsPending[WRITE], maxRequestsPending[WRITE]);
+                                  PRIu32
+                                  ", maximum permitted %"
+                                  PRIu32
+                                  ".\n",
+                 requestsPending[WRITE], maxRequestsPending[WRITE]);
     out->verbose(CALL_INFO, 2, 0, "Custom Requests pending %"
-    PRIu32
-    ", maximum permitted %"
-    PRIu32
-    ".\n",
-        requestsPending[CUSTOM], maxRequestsPending[CUSTOM]);
+                                  PRIu32
+                                  ", maximum permitted %"
+                                  PRIu32
+                                  ".\n",
+                 requestsPending[CUSTOM], maxRequestsPending[CUSTOM]);
 
     bool issued = false;
     uint32_t reqsIssuedThisCycle = 0;
-    std::vector <uint32_t> delReqs;
+    std::vector<uint32_t> delReqs;
 
     // We need to generate at least as many requests as can be looked up in the OoO window
     // otherwise the issue will have starvation.
@@ -544,7 +546,7 @@ bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
         GeneratorRequest *nxtRq = pendingRequests.at(i);
 
         if (nxtRq->getOperation() == REQ_FENCE) {
-            if (0 == requestsInFlight.size()) {
+            if (requestsInFlight.empty()) {
                 out->verbose(CALL_INFO, 4, 0,
                              "Fence operation completed, no pending requests, will be retired.\n");
 
@@ -576,11 +578,11 @@ bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
                     reqsIssuedThisCycle++;
 
                     out->verbose(CALL_INFO, 4, 0, "Request %"
-                    PRIu64
-                    " encountered, cleared to be issued, %"
-                    PRIu32
-                    " issued this cycle.\n",
-                        nxtRq->getRequestID(), reqsIssuedThisCycle);
+                                                  PRIu64
+                                                  " encountered, cleared to be issued, %"
+                                                  PRIu32
+                                                  " issued this cycle.\n",
+                                 nxtRq->getRequestID(), reqsIssuedThisCycle);
 
                     // Keep record we will delete at index i
                     delReqs.push_back(i);
@@ -591,9 +593,9 @@ bool RequestGenCPU::clockTick(SST::Cycle_t cycle) {
                     delete nxtRq;
                 } else {
                     out->verbose(CALL_INFO, 4, 0, "Request %"
-                    PRIu64
-                    " in queue, has dependencies which are not satisfied, wait.\n",
-                        nxtRq->getRequestID());
+                                                  PRIu64
+                                                  " in queue, has dependencies which are not satisfied, wait.\n",
+                                 nxtRq->getRequestID());
                 }
             } else {
                 out->verbose(CALL_INFO, 4, 0,

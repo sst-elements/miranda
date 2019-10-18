@@ -32,7 +32,7 @@ ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(ComponentId_t id, Par
 
 void ReverseSingleStreamGenerator::build(Params &params) {
 
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("ReverseSingleStreamGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -42,26 +42,15 @@ void ReverseSingleStreamGenerator::build(Params &params) {
     stride = params.find<uint64_t>("stride", 1);
 
     if (startIndex < stopIndex) {
-        out->fatal(CALL_INFO, -1, "Start address (%"
-        PRIu64
-        ") must be greater than stop address (%"
-        PRIu64
-        ") in reverse stream generator",
-            startIndex, stopIndex);
+        out->fatal(CALL_INFO, -1,
+                   "Start address (%" PRIu64 ") must be greater than stop address (%" PRIu64 ") in reverse stream generator",
+                   startIndex, stopIndex);
     }
 
-    out->verbose(CALL_INFO, 1, 0, "Start Address:         %"
-    PRIu64
-    "\n", startIndex);
-    out->verbose(CALL_INFO, 1, 0, "Stop Address:          %"
-    PRIu64
-    "\n", stopIndex);
-    out->verbose(CALL_INFO, 1, 0, "Data width:            %"
-    PRIu64
-    "\n", datawidth);
-    out->verbose(CALL_INFO, 1, 0, "Stride:                %"
-    PRIu64
-    "\n", stride);
+    out->verbose(CALL_INFO, 1, 0, "Start Address:         %" PRIu64 "\n", startIndex);
+    out->verbose(CALL_INFO, 1, 0, "Stop Address:          %" PRIu64 "\n", stopIndex);
+    out->verbose(CALL_INFO, 1, 0, "Data width:            %" PRIu64 "\n", datawidth);
+    out->verbose(CALL_INFO, 1, 0, "Stride:                %" PRIu64 "\n", stride);
 
     nextIndex = startIndex;
 }
@@ -71,9 +60,7 @@ ReverseSingleStreamGenerator::~ReverseSingleStreamGenerator() {
 }
 
 void ReverseSingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
-    out->verbose(CALL_INFO, 4, 0, "Generating next request at address: %"
-    PRIu64
-    "\n", nextIndex);
+    out->verbose(CALL_INFO, 4, 0, "Generating next request at address: %" PRIu64 "\n", nextIndex);
 
     q->push_back(new MemoryOpRequest(nextIndex * datawidth, datawidth, READ));
 

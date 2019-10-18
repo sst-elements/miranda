@@ -34,21 +34,21 @@ namespace SST {
 
             EmptyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {}
 
-            ~EmptyGenerator() {}
+            ~EmptyGenerator() override = default;
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+            void generate(MirandaRequestQueue<GeneratorRequest *> *) override {}
 
-            bool isFinished() { return true; }
+            bool isFinished() override { return true; }
 
-            void completed() {}
+            void completed() override {}
 
             SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
                 EmptyGenerator,
-            "miranda",
-            "EmptyGenerator",
-            SST_ELI_ELEMENT_VERSION(1,0,0),
-            "Creates an empty (null) generator",
-            SST::Miranda::RequestGenerator
+                "miranda",
+                "EmptyGenerator",
+                SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                "Creates an empty (null) generator",
+                SST::Miranda::RequestGenerator
             )
 
             SST_ELI_DOCUMENT_PARAMS(

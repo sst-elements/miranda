@@ -27,17 +27,17 @@ Stake::Stake(Component *owner, Params &params) :
     build(params);
 }
 
-Stake::Stake(Component *owner, Params &params) :
-    RequestGenerator(owner, params) {
+Stake::Stake(ComponentId_t id, Params &params) :
+    RequestGenerator(id, params) {
     build(params);
 }
 
 void Stake::build(Params &params) {
     // default parameters
-    spike = NULL;
+    spike = nullptr;
     rtn = 0;
 
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("Stake[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -63,11 +63,11 @@ void Stake::build(Params &params) {
     }
 
     out->verbose(CALL_INFO, 1, 0, "RISC-V Cores = %"
-    PRIu64
-    "\n", cores );
+                                  PRIu64
+                                  "\n", cores);
     out->verbose(CALL_INFO, 1, 0, "Starting PC = 0x%"
-    PRIx64
-    "\n", pc );
+                                  PRIx64
+                                  "\n", pc);
     out->verbose(CALL_INFO, 1, 0, "ISA = %s\n", isa.c_str());
     if (ext.length() > 0) {
         out->verbose(CALL_INFO, 1, 0, "RoCC Extension = %s\n", ext.c_str());
@@ -86,20 +86,20 @@ Stake::~Stake() {
 }
 
 // adapted from the original make_mems source from the spike.cc driver
-std::vector <std::pair<reg_t, mem_t *>> Stake::make_mems(const char *arg) {
+std::vector<std::pair<reg_t, mem_t *>> Stake::make_mems(const char *arg) {
     // handle legacy mem argument
     char *p;
     auto mb = strtoull(arg, &p, 0);
     if (*p == 0) {
         reg_t size = reg_t(mb) << 20;
-        if (size != (size_t) size)
+        if (size != (size_t) size) // condition is always false...?
             out->fatal(CALL_INFO, -1, "Memsize would overflow size_t");
-        return std::vector < std::pair < reg_t, mem_t *
-            >> (1, std::make_pair(reg_t(DRAM_BASE), new mem_t(size)));
+        return std::vector<std::pair<reg_t, mem_t *
+        >>(1, std::make_pair(reg_t(DRAM_BASE), new mem_t(size)));
     }
 
     // handle base/size tuples
-    std::vector <std::pair<reg_t, mem_t *>> res;
+    std::vector<std::pair<reg_t, mem_t *>> res;
     while (true) {
         auto base = strtoull(arg, &p, 0);
         if (!*p || *p != ':')
@@ -141,26 +141,26 @@ void Stake::StakeRequest(uint64_t addr,
         req = new MemoryOpRequest(addr, reqLength, READ);
         out->verbose(CALL_INFO, 8, 0,
                      "Issuing READ request for address %"
-        PRIu64
-        "\n", addr );
+                     PRIu64
+                     "\n", addr);
     } else if (Write) {
         req = new MemoryOpRequest(addr, reqLength, WRITE);
         out->verbose(CALL_INFO, 8, 0,
                      "Issuing WRITE request for address %"
-        PRIu64
-        "\n", addr );
+                     PRIu64
+                     "\n", addr);
     } else if (Atomic) {
         req = new MemoryOpRequest(addr, reqLength, READ);
         out->verbose(CALL_INFO, 8, 0,
                      "Issuing ATOMIC request for address %"
-        PRIu64
-        "\n", addr );
+                     PRIu64
+                     "\n", addr);
     } else if (Custom) {
         req = new MemoryOpRequest(addr, reqLength, READ);
         out->verbose(CALL_INFO, 8, 0,
                      "Issuing CUSTOM request for address %"
-        PRIu64
-        "\n", addr );
+                     PRIu64
+                     "\n", addr);
     } else {
         out->fatal(CALL_INFO, -1, "Unkown request type");
     }
@@ -174,8 +174,8 @@ void Stake::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     MQ = q;
 
     // setup the input variables
-    std::vector <std::pair<reg_t, mem_t *>> mems = make_mems(msize.c_str());
-    std::vector <std::string> htif_args;
+    std::vector<std::pair<reg_t, mem_t *>> mems = make_mems(msize.c_str());
+    std::vector<std::string> htif_args;
     std::vector<int> hartids; // null hartid vector
 
     // initiate the spike simulator

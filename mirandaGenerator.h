@@ -17,7 +17,7 @@
 #ifndef _H_SST_MEM_H_REQUEST_GEN
 #define _H_SST_MEM_H_REQUEST_GEN
 
-#include <stdint.h>
+#include <stdint.h>  // deprecated lib
 #include <sst/core/subcomponent.h>
 #include <sst/core/component.h>
 #include <sst/core/output.h>
@@ -43,7 +43,7 @@ namespace SST {
                 reqID = nextGeneratorRequestID++;
             }
 
-            virtual ~GeneratorRequest() {}
+            virtual ~GeneratorRequest() = default;
 
             virtual ReqOperation getOperation() const = 0;
 
@@ -82,7 +82,7 @@ namespace SST {
 
         protected:
             uint64_t reqID;
-            uint64_t issueTime;
+            uint64_t issueTime{};
             std::vector <uint64_t> dependsOn;
         };
 
@@ -107,7 +107,7 @@ namespace SST {
 //		printf("Resizing MirandaQueue from: %" PRIu32 " to %" PRIu32 "\n",
 //			curSize, newSize);
 
-                QueueType *newQ = (QueueType *) malloc(sizeof(QueueType) * newSize);
+                auto newQ = (QueueType *) malloc(sizeof(QueueType) * newSize);
                 for (uint32_t i = 0; i < curSize; ++i) {
                     newQ[i] = theQ[i];
                 }
@@ -131,11 +131,11 @@ namespace SST {
             }
 
             void erase(const std::vector <uint32_t> eraseList) {
-                if (0 == eraseList.size()) {
+                if (eraseList.empty()) {
                     return;
                 }
 
-                QueueType *newQ = (QueueType *) malloc(sizeof(QueueType) * maxCapacity);
+                auto newQ = (QueueType *) malloc(sizeof(QueueType) * maxCapacity);
 
                 uint32_t nextSkipIndex = 0;
                 uint32_t nextSkip = eraseList.at(nextSkipIndex);
@@ -185,9 +185,9 @@ namespace SST {
                 GeneratorRequest(),
                 addr(cAddr), length(cLength), op(cOpType) {}
 
-            ~MemoryOpRequest() {}
+            ~MemoryOpRequest() override = default;
 
-            ReqOperation getOperation() const { return op; }
+            ReqOperation getOperation() const override { return op; }
 
             bool isRead() const { return op == READ; }
 
@@ -214,7 +214,7 @@ namespace SST {
                 opcode = cOpcode;
             }
 
-            ~CustomOpRequest() {}
+            ~CustomOpRequest() override = default;
 
             uint32_t getOpcode() const { return opcode; }
 
@@ -226,9 +226,9 @@ namespace SST {
         public:
             FenceOpRequest() : GeneratorRequest() {}
 
-            ~FenceOpRequest() {}
+            ~FenceOpRequest() override = default;
 
-            ReqOperation getOperation() const { return REQ_FENCE; }
+            ReqOperation getOperation() const override { return REQ_FENCE; }
         };
 
         class RequestGenerator : public SubComponent {
@@ -236,11 +236,11 @@ namespace SST {
         public:
             SST_ELI_REGISTER_SUBCOMPONENT_API(SST::Miranda::RequestGenerator)
 
-            RequestGenerator(Component *owner, Params &params) : SubComponent(owner) {}
+            RequestGenerator(Component *owner, Params &) : SubComponent(owner) {}
 
-            RequestGenerator(ComponentId_t id, Params &params) : SubComponent(id) {}
+            RequestGenerator(ComponentId_t id, Params &) : SubComponent(id) {}
 
-            ~RequestGenerator() {}
+            ~RequestGenerator() override {}
 
             virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
 

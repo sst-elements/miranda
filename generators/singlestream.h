@@ -34,38 +34,39 @@ namespace SST {
 
             void build(Params &params);
 
-            ~SingleStreamGenerator();
+            ~SingleStreamGenerator() override;
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q);
+            void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
 
-            bool isFinished();
+            bool isFinished() override;
 
-            void completed();
+            void completed() override;
 
             SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
                 SingleStreamGenerator,
-            "miranda",
-            "SingleStreamGenerator",
-            SST_ELI_ELEMENT_VERSION(1,0,0),
-            "Creates a single reverse ordering stream of accesses to/from memory",
-            SST::Miranda::RequestGenerator
+                "miranda",
+                "SingleStreamGenerator",
+                SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                "Creates a single reverse ordering stream of accesses to/from memory",
+                SST::Miranda::RequestGenerator
             )
 
             SST_ELI_DOCUMENT_PARAMS(
-            { "start_at", "Sets the start *index* for this generator", "2048" },
-            { "stop_at", "Sets the stop *index* for this generator, stop < start", "0" },
-            { "verbose", "Sets the verbosity of the output", "0" },
-            { "datawidth", "Sets the width of the memory operation", "8" },
-            { "stride", "Sets the stride, since this is a reverse stream this is subtracted per iteration, def=1", "1" }
+                { "start_at", "Sets the start *index* for this generator", "2048" },
+                { "stop_at", "Sets the stop *index* for this generator, stop < start", "0" },
+                { "verbose", "Sets the verbosity of the output", "0" },
+                { "datawidth", "Sets the width of the memory operation", "8" },
+                { "stride", "Sets the stride, since this is a reverse stream this is subtracted per iteration, def=1", "1" }
             )
+
         private:
-            uint64_t reqLength;
-            uint64_t maxAddr;
-            uint64_t issueCount;
-            uint64_t nextAddr;
-            uint64_t startAddr;
-            Output *out;
-            ReqOperation memOp;
+            uint64_t reqLength{};
+            uint64_t maxAddr{};
+            uint64_t issueCount{};
+            uint64_t nextAddr{};
+            uint64_t startAddr{};
+            Output *out{};
+            ReqOperation memOp{};
 
         };
 

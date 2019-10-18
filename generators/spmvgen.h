@@ -39,7 +39,7 @@ namespace SST {
             }
 
             void build(Params &params) {
-                const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+                const auto verbose = params.find<uint32_t>("verbose", 0);
                 out = new Output("SPMVGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
                 matrixNx = params.find<uint64_t>("matrix_nx", 10);
@@ -75,32 +75,32 @@ namespace SST {
                 iterations = params.find<uint64_t>("iterations", 1);
             }
 
-            ~SPMVGenerator() {
+            ~SPMVGenerator() override {
                 delete out;
             }
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q) {
+            void generate(MirandaRequestQueue<GeneratorRequest *> *q) override {
                 for (uint64_t row = localRowStart; row < localRowEnd; row++) {
                     out->verbose(CALL_INFO, 2, 0, "Generating access for row %"
-                    PRIu64
-                    "\n", row);
+                                                  PRIu64
+                                                  "\n", row);
 
-                    MemoryOpRequest *readStart = new MemoryOpRequest(
+                    auto readStart = new MemoryOpRequest(
                         matrixRowIndicesStartAddr + (ordinalWidth * row), ordinalWidth, READ);
-                    MemoryOpRequest *readEnd = new MemoryOpRequest(
+                    auto readEnd = new MemoryOpRequest(
                         matrixRowIndicesStartAddr + (ordinalWidth * (row + 1)), ordinalWidth, READ);
 
                     q->push_back(readStart);
                     q->push_back(readEnd);
 
-                    MemoryOpRequest *readResultCurrentValue = new MemoryOpRequest(rhsVecStartAddr +
-                                                                                  (row *
-                                                                                   matrixNNZPerRow),
-                                                                                  elementWidth,
-                                                                                  WRITE);
-                    MemoryOpRequest *writeResult = new MemoryOpRequest(rhsVecStartAddr +
-                                                                       (row * matrixNNZPerRow),
-                                                                       elementWidth, WRITE);
+                    auto readResultCurrentValue = new MemoryOpRequest(rhsVecStartAddr +
+                                                                      (row *
+                                                                       matrixNNZPerRow),
+                                                                      elementWidth,
+                                                                      WRITE);
+                    auto writeResult = new MemoryOpRequest(rhsVecStartAddr +
+                                                           (row * matrixNNZPerRow),
+                                                           elementWidth, WRITE);
 
                     writeResult->addDependency(readResultCurrentValue->getRequestID());
 
@@ -112,22 +112,22 @@ namespace SST {
                         }
 
                         out->verbose(CALL_INFO, 4, 0, "Generating access for row %"
-                        PRIu64
-                        ", column: %"
-                        PRIu64
-                        "\n",
-                            row, col);
+                                                      PRIu64
+                                                      ", column: %"
+                                                      PRIu64
+                                                      "\n",
+                                     row, col);
 
-                        MemoryOpRequest *readMatElement = new MemoryOpRequest(
+                        auto readMatElement = new MemoryOpRequest(
                             matrixElementsStartAddr +
                             (row * matrixNNZPerRow + col) * elementWidth, elementWidth, READ);
-                        MemoryOpRequest *readCol = new MemoryOpRequest(
+                        auto readCol = new MemoryOpRequest(
                             matrixColumnIndicesStartAddr +
                             (row * matrixNNZPerRow + col) * ordinalWidth, ordinalWidth, READ);
-                        MemoryOpRequest *readLHSElem = new MemoryOpRequest(lhsVecStartAddr +
-                                                                           (row * matrixNNZPerRow +
-                                                                            col) * elementWidth,
-                                                                           elementWidth, READ);
+                        auto readLHSElem = new MemoryOpRequest(lhsVecStartAddr +
+                                                               (row * matrixNNZPerRow +
+                                                                col) * elementWidth,
+                                                               elementWidth, READ);
 
                         readCol->addDependency(readStart->getRequestID());
                         readCol->addDependency(readEnd->getRequestID());
@@ -147,52 +147,53 @@ namespace SST {
                 iterations--;
             }
 
-            bool isFinished() {
+            bool isFinished() override {
                 return (0 == iterations);
             }
 
-            void completed() {}
+            void completed() override {}
 
             SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
                 SPMVGenerator,
-            "miranda",
-            "SPMVGenerator",
-            SST_ELI_ELEMENT_VERSION(1,0,0),
-            "Creates a diagonal matrix access pattern",
-            SST::Miranda::RequestGenerator
+                "miranda",
+                "SPMVGenerator",
+                SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                "Creates a diagonal matrix access pattern",
+                SST::Miranda::RequestGenerator
             )
 
             SST_ELI_DOCUMENT_PARAMS(
-            { "matrix_nx", "Sets the horizontal dimension of the matrix", "10" },
-            { "matrix_ny", "Sets the vertical dimension of the matrix (the number of rows)", "10" },
-            { "element_width", "Sets the width of one matrix element, typically 8 for a double", "8" },
-            { "lhs_start_addr", "Sets the start address of the LHS vector", "0" },
-            { "rhs_start_addr", "Sets the start address of the RHS vector", "80" },
-            { "local_row_start", "Sets the row at which this generator will start processing", "0" },
-            { "local_row_end", "Sets the end at which rows will be processed by this generator", "10" },
-            { "ordinal_width", "Sets the width of ordinals (indices) in the matrix, typically 4 or 8", "8" },
-            { "matrix_row_indices_start_addr", "Sets the row indices start address for the matrix", "0" },
-            { "matrix_col_indices_start_addr", "Sets the col indices start address for the matrix", "0" },
-            { "matrix_element_start_addr", "Sets the start address of the elements array", "0" },
-            { "iterations", "Sets the number of repeats to perform" },
-            { "matrix_nnz_per_row", "Sets the number of non-zero elements per row", "9" }
+                { "matrix_nx", "Sets the horizontal dimension of the matrix", "10" },
+                { "matrix_ny", "Sets the vertical dimension of the matrix (the number of rows)", "10" },
+                { "element_width", "Sets the width of one matrix element, typically 8 for a double", "8" },
+                { "lhs_start_addr", "Sets the start address of the LHS vector", "0" },
+                { "rhs_start_addr", "Sets the start address of the RHS vector", "80" },
+                { "local_row_start", "Sets the row at which this generator will start processing", "0" },
+                { "local_row_end", "Sets the end at which rows will be processed by this generator", "10" },
+                { "ordinal_width", "Sets the width of ordinals (indices) in the matrix, typically 4 or 8", "8" },
+                { "matrix_row_indices_start_addr", "Sets the row indices start address for the matrix", "0" },
+                { "matrix_col_indices_start_addr", "Sets the col indices start address for the matrix", "0" },
+                { "matrix_element_start_addr", "Sets the start address of the elements array", "0" },
+                { "iterations", "Sets the number of repeats to perform" },
+                { "matrix_nnz_per_row", "Sets the number of non-zero elements per row", "9" }
             )
-        private:
-            Output *out;
 
-            uint64_t iterations;
-            uint64_t matrixNx;
-            uint64_t matrixNy;
-            uint64_t elementWidth;
-            uint64_t lhsVecStartAddr;
-            uint64_t rhsVecStartAddr;
-            uint64_t ordinalWidth;
-            uint64_t matrixNNZPerRow;
-            uint64_t matrixRowIndicesStartAddr;
-            uint64_t localRowStart;
-            uint64_t localRowEnd;
-            uint64_t matrixColumnIndicesStartAddr;
-            uint64_t matrixElementsStartAddr;
+        private:
+            Output *out{};
+
+            uint64_t iterations{};
+            uint64_t matrixNx{};
+            uint64_t matrixNy{};
+            uint64_t elementWidth{};
+            uint64_t lhsVecStartAddr{};
+            uint64_t rhsVecStartAddr{};
+            uint64_t ordinalWidth{};
+            uint64_t matrixNNZPerRow{};
+            uint64_t matrixRowIndicesStartAddr{};
+            uint64_t localRowStart{};
+            uint64_t localRowEnd{};
+            uint64_t matrixColumnIndicesStartAddr{};
+            uint64_t matrixElementsStartAddr{};
 
         };
 
