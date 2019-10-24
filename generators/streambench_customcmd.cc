@@ -13,25 +13,24 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
-#include <sst/core/params.h>
 #include "streambench_customcmd.h"
+
+#include <sst/core/params.h>
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-STREAMBenchGenerator_CustomCmd::STREAMBenchGenerator_CustomCmd(Component *owner, Params &params) :
-    RequestGenerator(owner, params) {
+STREAMBenchGenerator_CustomCmd::STREAMBenchGenerator_CustomCmd(Component *owner, Params &params)
+    : RequestGenerator(owner, params) {
     build(params);
 }
 
-STREAMBenchGenerator_CustomCmd::STREAMBenchGenerator_CustomCmd(ComponentId_t id, Params &params) :
-    RequestGenerator(id, params) {
+STREAMBenchGenerator_CustomCmd::STREAMBenchGenerator_CustomCmd(ComponentId_t id, Params &params)
+    : RequestGenerator(id, params) {
     build(params);
 }
 
 void STREAMBenchGenerator_CustomCmd::build(Params &params) {
-
     const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("STREAMBenchGenerator_CustomCmd[@p:@l]: ", verbose, 0, Output::STDOUT);
@@ -71,9 +70,7 @@ void STREAMBenchGenerator_CustomCmd::build(Params &params) {
     }
 }
 
-STREAMBenchGenerator_CustomCmd::~STREAMBenchGenerator_CustomCmd() {
-    delete out;
-}
+STREAMBenchGenerator_CustomCmd::~STREAMBenchGenerator_CustomCmd() { delete out; }
 
 void STREAMBenchGenerator_CustomCmd::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     for (uint64_t j = 0; j < n_per_call; ++j) {
@@ -103,8 +100,8 @@ void STREAMBenchGenerator_CustomCmd::generate(MirandaRequestQueue<GeneratorReque
             write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
         } else {
             // issue custom write
-            write_a = new CustomOpRequest(start_a + (i * reqLength), reqLength,
-                                          custom_write_opcode);
+            write_a =
+                new CustomOpRequest(start_a + (i * reqLength), reqLength, custom_write_opcode);
         }
 
         write_a->addDependency(read_b->getRequestID());
@@ -129,10 +126,6 @@ void STREAMBenchGenerator_CustomCmd::generate(MirandaRequestQueue<GeneratorReque
     }
 }
 
-bool STREAMBenchGenerator_CustomCmd::isFinished() {
-    return (i == n);
-}
+bool STREAMBenchGenerator_CustomCmd::isFinished() { return (i == n); }
 
-void STREAMBenchGenerator_CustomCmd::completed() {
-
-}
+void STREAMBenchGenerator_CustomCmd::completed() {}

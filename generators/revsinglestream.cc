@@ -13,25 +13,24 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
-#include <sst/core/params.h>
 #include "revsinglestream.h"
+
+#include <sst/core/params.h>
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(Component *owner, Params &params) :
-    RequestGenerator(owner, params) {
+ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(Component *owner, Params &params)
+    : RequestGenerator(owner, params) {
     build(params);
 }
 
-ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(ComponentId_t id, Params &params) :
-    RequestGenerator(id, params) {
+ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(ComponentId_t id, Params &params)
+    : RequestGenerator(id, params) {
     build(params);
 }
 
 void ReverseSingleStreamGenerator::build(Params &params) {
-
     const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("ReverseSingleStreamGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
@@ -43,7 +42,8 @@ void ReverseSingleStreamGenerator::build(Params &params) {
 
     if (startIndex < stopIndex) {
         out->fatal(CALL_INFO, -1,
-                   "Start address (%" PRIu64 ") must be greater than stop address (%" PRIu64 ") in reverse stream generator",
+                   "Start address (%" PRIu64 ") must be greater than stop address (%" PRIu64
+                   ") in reverse stream generator",
                    startIndex, stopIndex);
     }
 
@@ -55,9 +55,7 @@ void ReverseSingleStreamGenerator::build(Params &params) {
     nextIndex = startIndex;
 }
 
-ReverseSingleStreamGenerator::~ReverseSingleStreamGenerator() {
-    delete out;
-}
+ReverseSingleStreamGenerator::~ReverseSingleStreamGenerator() { delete out; }
 
 void ReverseSingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     out->verbose(CALL_INFO, 4, 0, "Generating next request at address: %" PRIu64 "\n", nextIndex);
@@ -68,10 +66,6 @@ void ReverseSingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest
     nextIndex = nextIndex - stride;
 }
 
-bool ReverseSingleStreamGenerator::isFinished() {
-    return (nextIndex == stopIndex);
-}
+bool ReverseSingleStreamGenerator::isFinished() { return (nextIndex == stopIndex); }
 
-void ReverseSingleStreamGenerator::completed() {
-
-}
+void ReverseSingleStreamGenerator::completed() {}

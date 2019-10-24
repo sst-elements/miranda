@@ -13,64 +13,59 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
 #ifndef _H_SST_MIRANDA_SINGLE_STREAM_GEN
 #define _H_SST_MIRANDA_SINGLE_STREAM_GEN
 
-#include "../mirandaGenerator.h"
 #include <sst/core/output.h>
 
 #include <queue>
 
+#include "../mirandaGenerator.h"
+
 namespace SST {
-    namespace Miranda {
+namespace Miranda {
 
-        class SingleStreamGenerator : public RequestGenerator {
+class SingleStreamGenerator : public RequestGenerator {
+   public:
+    SingleStreamGenerator(Component *owner, Params &params);
 
-        public:
-            SingleStreamGenerator(Component *owner, Params &params);
+    SingleStreamGenerator(ComponentId_t id, Params &params);
 
-            SingleStreamGenerator(ComponentId_t id, Params &params);
+    void build(Params &params);
 
-            void build(Params &params);
+    ~SingleStreamGenerator() override;
 
-            ~SingleStreamGenerator() override;
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
+    auto isFinished() -> bool override;
 
-            bool isFinished() override;
+    void completed() override;
 
-            void completed() override;
+    SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
+        SingleStreamGenerator, "miranda", "SingleStreamGenerator", SST_ELI_ELEMENT_VERSION(1, 0, 0),
+        "Creates a single reverse ordering stream of accesses to/from memory",
+        SST::Miranda::RequestGenerator)
 
-            SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
-                SingleStreamGenerator,
-                "miranda",
-                "SingleStreamGenerator",
-                SST_ELI_ELEMENT_VERSION(1, 0, 0),
-                "Creates a single reverse ordering stream of accesses to/from memory",
-                SST::Miranda::RequestGenerator
-            )
+    SST_ELI_DOCUMENT_PARAMS(
+        {"start_at", "Sets the start *index* for this generator", "2048"},
+        {"stop_at", "Sets the stop *index* for this generator, stop < start", "0"},
+        {"verbose", "Sets the verbosity of the output", "0"},
+        {"datawidth", "Sets the width of the memory operation", "8"},
+        {"stride",
+         "Sets the stride, since this is a reverse stream this is subtracted per iteration, def=1",
+         "1"})
 
-            SST_ELI_DOCUMENT_PARAMS(
-                { "start_at", "Sets the start *index* for this generator", "2048" },
-                { "stop_at", "Sets the stop *index* for this generator, stop < start", "0" },
-                { "verbose", "Sets the verbosity of the output", "0" },
-                { "datawidth", "Sets the width of the memory operation", "8" },
-                { "stride", "Sets the stride, since this is a reverse stream this is subtracted per iteration, def=1", "1" }
-            )
+   private:
+    uint64_t reqLength{};
+    uint64_t maxAddr{};
+    uint64_t issueCount{};
+    uint64_t nextAddr{};
+    uint64_t startAddr{};
+    Output *out{};
+    ReqOperation memOp{};
+};
 
-        private:
-            uint64_t reqLength{};
-            uint64_t maxAddr{};
-            uint64_t issueCount{};
-            uint64_t nextAddr{};
-            uint64_t startAddr{};
-            Output *out{};
-            ReqOperation memOp{};
-
-        };
-
-    }
-}
+}  // namespace Miranda
+}  // namespace SST
 
 #endif

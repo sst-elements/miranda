@@ -13,111 +13,104 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
 #ifndef _H_SST_MIRANDA_STAKE
 #define _H_SST_MIRANDA_STAKE
 
-#include "../mirandaGenerator.h"
 #include <sst/core/output.h>
 
 #include <queue>
 
+#include "../mirandaGenerator.h"
+
 // Spike required headers
-#include "sim.h"
-#include "mmu.h"
-#include "remote_bitbang.h"
-#include "cachesim.h"
-#include "extension.h"
 #include <dlfcn.h>
 #include <fesvr/option_parser.h>
-#include <stdio.h>  // deprecated lib
+#include <stdio.h>   // deprecated lib
 #include <stdlib.h>  // deprecated lib
-#include <vector>
-#include <string>
+
 #include <memory>
+#include <string>
+#include <vector>
+
+#include "cachesim.h"
+#include "extension.h"
+#include "mmu.h"
+#include "remote_bitbang.h"
+#include "sim.h"
 
 namespace SST {
-    namespace Miranda {
+namespace Miranda {
 
-        class Stake : public RequestGenerator {
+class Stake : public RequestGenerator {
+   public:
+    Stake(Component *owner, Params &params);
 
-        public:
-            Stake(Component *owner, Params &params);
+    Stake(ComponentId_t id, Params &params);
 
-            Stake(ComponentId_t id, Params &params);
+    void build(Params &params);  // Temporary while legacy constructor is getting deprecated
 
-            void build(Params &params); // Temporary while legacy constructor is getting deprecated
+    ~Stake() override;
 
-            ~Stake() override;
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
+    bool isFinished() override;
 
-            bool isFinished() override;
+    void completed() override;
 
-            void completed() override;
+    void StakeRequest(uint64_t addr, uint32_t RegLen, bool Read, bool Write, bool Atomic,
+                      bool Custom, uint32_t Code);
 
-            void StakeRequest(uint64_t addr, uint32_t RegLen,
-                              bool Read, bool Write, bool Atomic, bool Custom,
-                              uint32_t Code);
+    SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
+        Stake, "miranda", "Stake", SST_ELI_ELEMENT_VERSION(1, 0, 0),
+        "Instantiates a RISC-V Spike instance to drive memory traffic",
+        SST::Miranda::RequestGenerator)
 
-            SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
-                Stake,
-                "miranda",
-                "Stake",
-                SST_ELI_ELEMENT_VERSION(1, 0, 0),
-                "Instantiates a RISC-V Spike instance to drive memory traffic",
-                SST::Miranda::RequestGenerator
-            )
+    SST_ELI_DOCUMENT_PARAMS({"verbose", "Sets the verbosity output of the generator", "0"},
+                            {"cores", "Sets the number of cores in the spike instance", "1"},
+                            {"mem_size", "Sets the RISC-V Spike memory subsystem size", "2048"},
+                            {"log", "Generate a log of the execution", "0"},
+                            {"isa", "Set the respective RISC-V ISA", "RV64IMAFDC"},
+                            {"pc", "Override the default ELF entry point", "0x80000000"},
+                            {"proxy_kernel", "Set the default proxy kernel", "pk"},
+                            {"bin", "Set the RISC-V ELF binary", "NULL"},
+                            {"args", "Set the RISC-V binary arguments", "NULL"},
+                            {"extension", "Specify the RoCC extension", "NULL"},
+                            {"extlib", "Shared library to load", "NULL"})
 
-            SST_ELI_DOCUMENT_PARAMS(
-                { "verbose", "Sets the verbosity output of the generator", "0" },
-                { "cores", "Sets the number of cores in the spike instance", "1" },
-                { "mem_size", "Sets the RISC-V Spike memory subsystem size", "2048" },
-                { "log", "Generate a log of the execution", "0" },
-                { "isa", "Set the respective RISC-V ISA", "RV64IMAFDC" },
-                { "pc", "Override the default ELF entry point", "0x80000000" },
-                { "proxy_kernel", "Set the default proxy kernel", "pk" },
-                { "bin", "Set the RISC-V ELF binary", "NULL" },
-                { "args", "Set the RISC-V binary arguments", "NULL" },
-                { "extension", "Specify the RoCC extension", "NULL" },
-                { "extlib", "Shared library to load", "NULL" }
-            )
+   private:
+    bool done{};         // holds the completion code of the sim
+    bool log{};          // log the Spike execution to a file
+    int rtn{};           // return code from the simulator
+    size_t cores{};      // number of RISC-V cores
+    uint64_t pc{};       // starting pc
+    std::string msize;   // size of the memory subsystem
+    std::string isa;     // isa string
+    std::string pk;      // proxy kernel
+    std::string bin;     // ELF binary
+    std::string args;    // Binary args
+    std::string ext;     // RoCC extension
+    std::string extlib;  // extension library
 
-        private:
-            bool done{};          // holds the completion code of the sim
-            bool log{};           // log the Spike execution to a file
-            int rtn{};            // return code from the simulator
-            size_t cores{};       // number of RISC-V cores
-            uint64_t pc{};        // starting pc
-            std::string msize;  // size of the memory subsystem
-            std::string isa;    // isa string
-            std::string pk;     // proxy kernel
-            std::string bin;    // ELF binary
-            std::string args;   // Binary args
-            std::string ext;    // RoCC extension
-            std::string extlib; // extension library
+    MirandaRequestQueue<GeneratorRequest *> *MQ{};  // memory request queue
+    std::vector<std::pair<reg_t, mem_t *>> make_mems(const char *arg);
 
-            MirandaRequestQueue<GeneratorRequest *> *MQ{}; // memory request queue
-            std::vector<std::pair<reg_t, mem_t *>> make_mems(const char *arg);
+    Output *out{};  // output handle
 
-            Output *out{};     // output handle
+    sim_t *spike{};  // spike simulator instance
+};
 
-            sim_t *spike{};     // spike simulator instance
-        };
-
-    }
-}
+}  // namespace Miranda
+}  // namespace SST
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void SR(uint64_t addr, uint32_t RegLen,
-        bool Read, bool Write, bool Atomic, bool Custom,
+void SR(uint64_t addr, uint32_t RegLen, bool Read, bool Write, bool Atomic, bool Custom,
         uint32_t Code);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif  // __cplusplus
 
 #endif

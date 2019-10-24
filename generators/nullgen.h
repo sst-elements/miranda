@@ -13,50 +13,43 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
 #ifndef _H_SST_MIRANDA_EMPTY_GEN
 #define _H_SST_MIRANDA_EMPTY_GEN
 
-#include "../mirandaGenerator.h"
 #include <sst/core/output.h>
 
 #include <queue>
 
+#include "../mirandaGenerator.h"
+
 using namespace SST::RNG;
 
 namespace SST {
-    namespace Miranda {
+namespace Miranda {
 
-        class EmptyGenerator : public RequestGenerator {
+class EmptyGenerator : public RequestGenerator {
+   public:
+    EmptyGenerator(Component *owner, Params &params) : RequestGenerator(owner, params) {}
 
-        public:
-            EmptyGenerator(Component *owner, Params &params) : RequestGenerator(owner, params) {}
+    EmptyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {}
 
-            EmptyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {}
+    ~EmptyGenerator() override = default;
 
-            ~EmptyGenerator() override = default;
+    void generate(MirandaRequestQueue<GeneratorRequest *> * /*q*/) override {}
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *) override {}
+    auto isFinished() -> bool override { return true; }
 
-            bool isFinished() override { return true; }
+    void completed() override {}
 
-            void completed() override {}
+    SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(EmptyGenerator, "miranda", "EmptyGenerator",
+                                          SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                                          "Creates an empty (null) generator",
+                                          SST::Miranda::RequestGenerator)
 
-            SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
-                EmptyGenerator,
-                "miranda",
-                "EmptyGenerator",
-                SST_ELI_ELEMENT_VERSION(1, 0, 0),
-                "Creates an empty (null) generator",
-                SST::Miranda::RequestGenerator
-            )
+    SST_ELI_DOCUMENT_PARAMS()
+};
 
-            SST_ELI_DOCUMENT_PARAMS(
-            )
-
-        };
-
-    }
-}
+}  // namespace Miranda
+}  // namespace SST
 
 #endif

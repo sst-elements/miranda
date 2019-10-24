@@ -13,11 +13,11 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
+#include "gupsgen.h"
 
-#include <sst/core/sst_config.h>
 #include <sst/core/params.h>
 #include <sst/core/rng/marsaglia.h>
-#include "gupsgen.h"
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
@@ -57,7 +57,6 @@ GUPSGenerator::~GUPSGenerator() {
 }
 
 void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
-
     const uint64_t rand_addr = rng->generateNextUInt64();
     // Ensure we have a reqLength aligned request
 
@@ -66,8 +65,8 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     addr += memStart;
 
     out->verbose(CALL_INFO, 4, 0,
-                 "Generating next request number: %" PRIu64 " at address %" PRIu64 "\n",
-                 issueCount, addr);
+                 "Generating next request number: %" PRIu64 " at address %" PRIu64 "\n", issueCount,
+                 addr);
 
     auto readAddr = new MemoryOpRequest(addr, reqLength, READ);
     auto writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
@@ -80,10 +79,6 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     issueCount--;
 }
 
-bool GUPSGenerator::isFinished() {
-    return (issueCount == 0);
-}
+bool GUPSGenerator::isFinished() { return (issueCount == 0); }
 
-void GUPSGenerator::completed() {
-
-}
+void GUPSGenerator::completed() {}

@@ -13,52 +13,52 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
 #ifndef _H_SST_MEM_H_REQUEST_GEN_EVENT
 #define _H_SST_MEM_H_REQUEST_GEN_EVENT
 
-#include <stdint.h>  // deprecated lib
 #include <sst/core/event.h>
 #include <sst/core/params.h>
 
+#include <cstdint>  // deprecated lib
+
 namespace SST {
-    namespace Miranda {
+namespace Miranda {
 
-        class MirandaReqEvent : public SST::Event {
-        public:
-            struct Generator {
-                std::string name;
-                SST::Params params;
-            };
+class MirandaReqEvent : public SST::Event {
+   public:
+    struct Generator {
+        std::string name;
+        SST::Params params;
+    };
 
-            std::deque <std::pair<std::string, SST::Params>> generators;
+    std::deque<std::pair<std::string, SST::Params>> generators;
 
-            uint64_t key{};
-        private:
+    uint64_t key{};
 
-            void serialize_order(SST::Core::Serialization::serializer &ser) override {
-                Event::serialize_order(ser);
-                ser & key;
-                ser & generators;
-            }
-
-            ImplementSerializable(SST::Miranda::MirandaReqEvent);
-        };
-
-        class MirandaRspEvent : public SST::Event {
-        public:
-            uint64_t key{};
-        private:
-            void serialize_order(SST::Core::Serialization::serializer &ser) override {
-                Event::serialize_order(ser);
-                ser & key;
-            }
-
-            ImplementSerializable(SST::Miranda::MirandaRspEvent);
-        };
-
-
+   private:
+    void serialize_order(SST::Core::Serialization::serializer &ser) override {
+        Event::serialize_order(ser);
+        ser &key;
+        ser &generators;
     }
-}
+
+    ImplementSerializable(SST::Miranda::MirandaReqEvent);
+};
+
+class MirandaRspEvent : public SST::Event {
+   public:
+    uint64_t key{};
+
+   private:
+    void serialize_order(SST::Core::Serialization::serializer &ser) override {
+        Event::serialize_order(ser);
+        ser &key;
+    }
+
+    ImplementSerializable(SST::Miranda::MirandaRspEvent);
+};
+
+}  // namespace Miranda
+}  // namespace SST
 
 #endif

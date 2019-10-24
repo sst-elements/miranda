@@ -13,20 +13,20 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
-#include <sst/core/params.h>
 #include "streambench.h"
+
+#include <sst/core/params.h>
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-STREAMBenchGenerator::STREAMBenchGenerator(Component *owner, Params &params) :
-    RequestGenerator(owner, params) {
+STREAMBenchGenerator::STREAMBenchGenerator(Component *owner, Params &params)
+    : RequestGenerator(owner, params) {
     build(params);
 }
 
-STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params) :
-    RequestGenerator(id, params) {
+STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params)
+    : RequestGenerator(id, params) {
     build(params);
 }
 
@@ -50,41 +50,21 @@ void STREAMBenchGenerator::build(Params &params) {
 
     i = 0;
 
-    out->verbose(CALL_INFO, 1, 0, "STREAM-N length is %"
-    PRIu64
-    "\n", n);
-    out->verbose(CALL_INFO, 1, 0, "operandwidth       %"
-    PRIu64
-    "\n", reqLength);
-    out->verbose(CALL_INFO, 1, 0, "Start of array a @ 0x%"
-    PRIx64
-    "\n", start_a);
-    out->verbose(CALL_INFO, 1, 0, "Start of array b @ 0x%"
-    PRIx64
-    "\n", start_b);
-    out->verbose(CALL_INFO, 1, 0, "Start of array c @ 0x%"
-    PRIx64
-    "\n", start_c);
-    out->verbose(CALL_INFO, 1, 0, "Array Length:      %"
-    PRIu64
-    " bytes\n", (n * reqLength));
-    out->verbose(CALL_INFO, 1, 0, "Total arrays:      %"
-    PRIu64
-    " bytes\n", (3 * n * reqLength));
-    out->verbose(CALL_INFO, 1, 0, "N-per-generate     %"
-    PRIu64
-    "\n", n_per_call);
+    out->verbose(CALL_INFO, 1, 0, "STREAM-N length is %" PRIu64 "\n", n);
+    out->verbose(CALL_INFO, 1, 0, "operandwidth       %" PRIu64 "\n", reqLength);
+    out->verbose(CALL_INFO, 1, 0, "Start of array a @ 0x%" PRIx64 "\n", start_a);
+    out->verbose(CALL_INFO, 1, 0, "Start of array b @ 0x%" PRIx64 "\n", start_b);
+    out->verbose(CALL_INFO, 1, 0, "Start of array c @ 0x%" PRIx64 "\n", start_c);
+    out->verbose(CALL_INFO, 1, 0, "Array Length:      %" PRIu64 " bytes\n", (n * reqLength));
+    out->verbose(CALL_INFO, 1, 0, "Total arrays:      %" PRIu64 " bytes\n", (3 * n * reqLength));
+    out->verbose(CALL_INFO, 1, 0, "N-per-generate     %" PRIu64 "\n", n_per_call);
 }
 
-STREAMBenchGenerator::~STREAMBenchGenerator() {
-    delete out;
-}
+STREAMBenchGenerator::~STREAMBenchGenerator() { delete out; }
 
 void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     for (uint64_t j = 0; j < n_per_call; ++j) {
-        out->verbose(CALL_INFO, 4, 0, "Array index: %"
-        PRIu64
-        "\n", i);
+        out->verbose(CALL_INFO, 4, 0, "Array index: %" PRIu64 "\n", i);
 
         // If we reached our limit then step out of the generation
         if (i == n) {
@@ -98,29 +78,22 @@ void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) 
         write_a->addDependency(read_b->getRequestID());
         write_a->addDependency(read_c->getRequestID());
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %"
-        PRIu64
-        "\n", (start_b + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n",
+                     (start_b + (i * reqLength)));
         q->push_back(read_b);
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %"
-        PRIu64
-        "\n", (start_c + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n",
+                     (start_c + (i * reqLength)));
         q->push_back(read_c);
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing WRITE request for address %"
-        PRIu64
-        "\n", (start_a + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing WRITE request for address %" PRIu64 "\n",
+                     (start_a + (i * reqLength)));
         q->push_back(write_a);
 
         i++;
     }
 }
 
-bool STREAMBenchGenerator::isFinished() {
-    return (i == n);
-}
+bool STREAMBenchGenerator::isFinished() { return (i == n); }
 
-void STREAMBenchGenerator::completed() {
-
-}
+void STREAMBenchGenerator::completed() {}

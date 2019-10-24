@@ -13,25 +13,24 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
-#include <sst/core/params.h>
 #include "stencil3dbench.h"
+
+#include <sst/core/params.h>
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-Stencil3DBenchGenerator::Stencil3DBenchGenerator(Component *owner, Params &params) :
-    RequestGenerator(owner, params) {
+Stencil3DBenchGenerator::Stencil3DBenchGenerator(Component *owner, Params &params)
+    : RequestGenerator(owner, params) {
     build(params);
 }
 
-Stencil3DBenchGenerator::Stencil3DBenchGenerator(ComponentId_t id, Params &params) :
-    RequestGenerator(id, params) {
+Stencil3DBenchGenerator::Stencil3DBenchGenerator(ComponentId_t id, Params &params)
+    : RequestGenerator(id, params) {
     build(params);
 }
 
 void Stencil3DBenchGenerator::build(Params &params) {
-
     const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("Stencil3DBenchGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
@@ -51,29 +50,22 @@ void Stencil3DBenchGenerator::build(Params &params) {
     currentZ = startZ + 1;
 }
 
-Stencil3DBenchGenerator::~Stencil3DBenchGenerator() {
-    delete out;
-}
+Stencil3DBenchGenerator::~Stencil3DBenchGenerator() { delete out; }
 
 void Stencil3DBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
-    out->verbose(
-        CALL_INFO, 2, 0, "Enqueue iteration: %" PRIu32 "...\n", currentItr);
+    out->verbose(CALL_INFO, 2, 0, "Enqueue iteration: %" PRIu32 "...\n", currentItr);
     out->verbose(CALL_INFO, 4, 0,
-                 "Itr: Z:[%" PRIu32 ",%" PRIu32 "], Y:[%" PRIu32 ",%" PRIu32 "], X:[%"  PRIu32 ",%" PRIu32"]\n",
+                 "Itr: Z:[%" PRIu32 ",%" PRIu32 "], Y:[%" PRIu32 ",%" PRIu32 "], X:[%" PRIu32
+                 ",%" PRIu32 "]\n",
                  (startZ + 1), (endZ - 1), 1, (nY - 1), 1, (nX - 1));
 
     uint64_t countReqGen = 0;
 
-    out->verbose(CALL_INFO, 2, 0, "Generating for plane Z=%"
-                                  PRIu32
-                                  "..\n", currentZ);
+    out->verbose(CALL_INFO, 2, 0, "Generating for plane Z=%" PRIu32 "..\n", currentZ);
 
     for (uint32_t curY = 1; curY < (nY - 1); curY++) {
-        out->verbose(CALL_INFO, 4, 0, "Generating for plane (Z=%"
-                                      PRIu32
-                                      ", Y=%"
-                                      PRIu32
-                                      ")...\n", currentZ, curY);
+        out->verbose(CALL_INFO, 4, 0, "Generating for plane (Z=%" PRIu32 ", Y=%" PRIu32 ")...\n",
+                     currentZ, curY);
 
         for (uint32_t curX = 1; curX < (nX - 1); curX++) {
             auto read_a = new MemoryOpRequest(
@@ -147,12 +139,10 @@ void Stencil3DBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *
                 datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ + 1), datawidth,
                 READ);
 
-
-            auto write_a = new MemoryOpRequest(
-                (nX * nY * nZ * datawidth) +
-                datawidth * convertPositionToIndex(curX, curY, currentZ),
-                datawidth, WRITE
-            );
+            auto write_a =
+                new MemoryOpRequest((nX * nY * nZ * datawidth) +
+                                        datawidth * convertPositionToIndex(curX, curY, currentZ),
+                                    datawidth, WRITE);
 
             write_a->addDependency(read_a->getRequestID());
             write_a->addDependency(read_b->getRequestID());
@@ -215,9 +205,7 @@ void Stencil3DBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *
         }
     }
 
-    out->verbose(CALL_INFO, 4, 0, "Generated %"
-                                  PRIu64
-                                  " requests this iteration.\n", countReqGen);
+    out->verbose(CALL_INFO, 4, 0, "Generated %" PRIu64 " requests this iteration.\n", countReqGen);
 
     if (currentZ == (endZ - 2)) {
         currentZ = startZ + 1;
@@ -229,19 +217,16 @@ void Stencil3DBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *
 
 bool Stencil3DBenchGenerator::isFinished() {
     out->verbose(CALL_INFO, 8, 0,
-                 "Checking stencil completed - current iteration %" PRIu32 ", max itr: %" PRIu32 "\n",
+                 "Checking stencil completed - current iteration %" PRIu32 ", max itr: %" PRIu32
+                 "\n",
                  currentItr, maxItr);
     return (currentItr == maxItr);
 }
 
-void Stencil3DBenchGenerator::completed() {
+void Stencil3DBenchGenerator::completed() {}
 
-}
-
-void Stencil3DBenchGenerator::convertIndexToPosition(const uint32_t index,
-                                                     uint32_t *posX, uint32_t *posY,
-                                                     uint32_t *posZ) {
-
+void Stencil3DBenchGenerator::convertIndexToPosition(const uint32_t index, uint32_t *posX,
+                                                     uint32_t *posY, uint32_t *posZ) {
     const int32_t my_plane = index % (nX & nY);
     *posY = my_plane / nX;
 
@@ -250,13 +235,12 @@ void Stencil3DBenchGenerator::convertIndexToPosition(const uint32_t index,
     *posZ = index / (nX * nY);
 }
 
-uint32_t Stencil3DBenchGenerator::convertPositionToIndex(const uint32_t posX,
-                                                         const uint32_t posY, const uint32_t posZ) {
-
+uint32_t Stencil3DBenchGenerator::convertPositionToIndex(const uint32_t posX, const uint32_t posY,
+                                                         const uint32_t posZ) {
     if ((posX >= nX) || (posY >= nY) || (posZ >= nZ)) {
         out->fatal(CALL_INFO, -1,
-                   "Incorrect position calc: (%" PRIu32 ", %" PRIu32 ", %" PRIu32 ")\n",
-                   posX, posY, posZ);
+                   "Incorrect position calc: (%" PRIu32 ", %" PRIu32 ", %" PRIu32 ")\n", posX, posY,
+                   posZ);
 
         return 0;
     } else {
