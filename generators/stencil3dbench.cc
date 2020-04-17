@@ -13,22 +13,19 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
-#include <sst/core/params.h>
 #include "stencil3dbench.h"
+#include <sst/core/params.h>
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-
-Stencil3DBenchGenerator::Stencil3DBenchGenerator(ComponentId_t id, Params &params) :
-        RequestGenerator(id, params) {
+Stencil3DBenchGenerator::Stencil3DBenchGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {
     build(params);
 }
 
 void Stencil3DBenchGenerator::build(Params &params) {
 
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("Stencil3DBenchGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -47,9 +44,7 @@ void Stencil3DBenchGenerator::build(Params &params) {
     currentZ = startZ + 1;
 }
 
-Stencil3DBenchGenerator::~Stencil3DBenchGenerator() {
-    delete out;
-}
+Stencil3DBenchGenerator::~Stencil3DBenchGenerator() { delete out; }
 
 void Stencil3DBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     out->verbose(CALL_INFO, 2, 0, "Enqueue iteration: %" PRIu32 "...\n", currentItr);
@@ -65,73 +60,72 @@ void Stencil3DBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *
         out->verbose(CALL_INFO, 4, 0, "Generating for plane (Z=%" PRIu32 ", Y=%" PRIu32 ")...\n", currentZ, curY);
 
         for (uint32_t curX = 1; curX < (nX - 1); curX++) {
-            MemoryOpRequest *read_a = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY - 1, currentZ - 1), datawidth, READ);
-            MemoryOpRequest *read_b = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX, curY - 1, currentZ - 1), datawidth, READ);
-            MemoryOpRequest *read_c = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY - 1, currentZ - 1), datawidth, READ);
+            auto *read_a = new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY - 1, currentZ - 1),
+                                               datawidth, READ);
+            auto *read_b =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY - 1, currentZ - 1), datawidth, READ);
+            auto *read_c = new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY - 1, currentZ - 1),
+                                               datawidth, READ);
 
-            MemoryOpRequest *read_d = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY, currentZ - 1), datawidth, READ);
-            MemoryOpRequest *read_e = new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY, currentZ - 1),
-                                                          datawidth, READ);
-            MemoryOpRequest *read_f = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY, currentZ - 1), datawidth, READ);
+            auto *read_d =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY, currentZ - 1), datawidth, READ);
+            auto *read_e =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY, currentZ - 1), datawidth, READ);
+            auto *read_f =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY, currentZ - 1), datawidth, READ);
 
-            MemoryOpRequest *read_g = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY + 1, currentZ - 1), datawidth, READ);
-            MemoryOpRequest *read_h = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX, curY + 1, currentZ - 1), datawidth, READ);
-            MemoryOpRequest *read_i = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ - 1), datawidth, READ);
+            auto *read_g = new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY + 1, currentZ - 1),
+                                               datawidth, READ);
+            auto *read_h =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY + 1, currentZ - 1), datawidth, READ);
+            auto *read_i = new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ - 1),
+                                               datawidth, READ);
 
-            MemoryOpRequest *read_j = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY - 1, currentZ), datawidth, READ);
-            MemoryOpRequest *read_k = new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY - 1, currentZ),
-                                                          datawidth, READ);
-            MemoryOpRequest *read_l = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY - 1, currentZ), datawidth, READ);
+            auto *read_j =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY - 1, currentZ), datawidth, READ);
+            auto *read_k =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY - 1, currentZ), datawidth, READ);
+            auto *read_l =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY - 1, currentZ), datawidth, READ);
 
-            MemoryOpRequest *read_m = new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY, currentZ),
-                                                          datawidth, READ);
-            MemoryOpRequest *read_n = new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY, currentZ),
-                                                          datawidth, READ);
-            MemoryOpRequest *read_o = new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY, currentZ),
-                                                          datawidth, READ);
+            auto *read_m =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY, currentZ), datawidth, READ);
+            auto *read_n =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY, currentZ), datawidth, READ);
+            auto *read_o =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY, currentZ), datawidth, READ);
 
-            MemoryOpRequest *read_p = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY + 1, currentZ), datawidth, READ);
-            MemoryOpRequest *read_q = new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY + 1, currentZ),
-                                                          datawidth, READ);
-            MemoryOpRequest *read_r = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ), datawidth, READ);
+            auto *read_p =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY + 1, currentZ), datawidth, READ);
+            auto *read_q =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY + 1, currentZ), datawidth, READ);
+            auto *read_r =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ), datawidth, READ);
 
-            MemoryOpRequest *read_s = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY - 1, currentZ + 1), datawidth, READ);
-            MemoryOpRequest *read_t = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX, curY - 1, currentZ + 1), datawidth, READ);
-            MemoryOpRequest *read_u = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY - 1, currentZ + 1), datawidth, READ);
+            auto *read_s = new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY - 1, currentZ + 1),
+                                               datawidth, READ);
+            auto *read_t =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY - 1, currentZ + 1), datawidth, READ);
+            auto *read_u = new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY - 1, currentZ + 1),
+                                               datawidth, READ);
 
-            MemoryOpRequest *read_v = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY, currentZ + 1), datawidth, READ);
-            MemoryOpRequest *read_w = new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY, currentZ + 1),
-                                                          datawidth, READ);
-            MemoryOpRequest *read_x = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY, currentZ + 1), datawidth, READ);
+            auto *read_v =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY, currentZ + 1), datawidth, READ);
+            auto *read_w =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY, currentZ + 1), datawidth, READ);
+            auto *read_x =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY, currentZ + 1), datawidth, READ);
 
-            MemoryOpRequest *read_y = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX - 1, curY + 1, currentZ + 1), datawidth, READ);
-            MemoryOpRequest *read_z = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX, curY + 1, currentZ + 1), datawidth, READ);
-            MemoryOpRequest *read_zz = new MemoryOpRequest(
-                    datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ + 1), datawidth, READ);
+            auto *read_y = new MemoryOpRequest(datawidth * convertPositionToIndex(curX - 1, curY + 1, currentZ + 1),
+                                               datawidth, READ);
+            auto *read_z =
+                new MemoryOpRequest(datawidth * convertPositionToIndex(curX, curY + 1, currentZ + 1), datawidth, READ);
+            auto *read_zz = new MemoryOpRequest(datawidth * convertPositionToIndex(curX + 1, curY + 1, currentZ + 1),
+                                                datawidth, READ);
 
-
-            MemoryOpRequest *write_a = new MemoryOpRequest((nX * nY * nZ * datawidth) +
-                                                           datawidth * convertPositionToIndex(curX, curY, currentZ),
-                                                           datawidth, WRITE);
+            auto *write_a = new MemoryOpRequest((nX * nY * nZ * datawidth) +
+                                                    datawidth * convertPositionToIndex(curX, curY, currentZ),
+                                                datawidth, WRITE);
 
             write_a->addDependency(read_a->getRequestID());
             write_a->addDependency(read_b->getRequestID());
@@ -210,12 +204,10 @@ bool Stencil3DBenchGenerator::isFinished() {
     return (currentItr == maxItr);
 }
 
-void Stencil3DBenchGenerator::completed() {
+void Stencil3DBenchGenerator::completed() {}
 
-}
-
-void Stencil3DBenchGenerator::convertIndexToPosition(const uint32_t index,
-                                                     uint32_t *posX, uint32_t *posY, uint32_t *posZ) {
+void Stencil3DBenchGenerator::convertIndexToPosition(const uint32_t index, uint32_t *posX, uint32_t *posY,
+                                                     uint32_t *posZ) {
 
     const int32_t my_plane = index % (nX & nY);
     *posY = my_plane / nX;
@@ -225,12 +217,12 @@ void Stencil3DBenchGenerator::convertIndexToPosition(const uint32_t index,
     *posZ = index / (nX * nY);
 }
 
-uint32_t Stencil3DBenchGenerator::convertPositionToIndex(const uint32_t posX,
-                                                         const uint32_t posY, const uint32_t posZ) {
+uint32_t Stencil3DBenchGenerator::convertPositionToIndex(const uint32_t posX, const uint32_t posY,
+                                                         const uint32_t posZ) {
 
     if ((posX >= nX) || (posY >= nY) || (posZ >= nZ)) {
-        out->fatal(CALL_INFO, -1, "Incorrect position calc: (%" PRIu32 ", %" PRIu32 ", %" PRIu32 ")\n",
-                   posX, posY, posZ);
+        out->fatal(CALL_INFO, -1, "Incorrect position calc: (%" PRIu32 ", %" PRIu32 ", %" PRIu32 ")\n", posX, posY,
+                   posZ);
 
         return 0;
     } else {

@@ -13,21 +13,18 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
-#include <sst/core/params.h>
 #include "streambench.h"
+#include <sst/core/params.h>
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-
-STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params) :
-        RequestGenerator(id, params) {
+STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {
     build(params);
 }
 
 void STREAMBenchGenerator::build(Params &params) {
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("STREAMBenchGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -56,9 +53,7 @@ void STREAMBenchGenerator::build(Params &params) {
     out->verbose(CALL_INFO, 1, 0, "N-per-generate     %" PRIu64 "\n", n_per_call);
 }
 
-STREAMBenchGenerator::~STREAMBenchGenerator() {
-    delete out;
-}
+STREAMBenchGenerator::~STREAMBenchGenerator() { delete out; }
 
 void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     for (uint64_t j = 0; j < n_per_call; ++j) {
@@ -69,9 +64,9 @@ void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) 
             break;
         }
 
-        MemoryOpRequest *read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
-        MemoryOpRequest *read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
-        MemoryOpRequest *write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
+        auto *read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
+        auto *read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
+        auto *write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
 
         write_a->addDependency(read_b->getRequestID());
         write_a->addDependency(read_c->getRequestID());
@@ -89,10 +84,6 @@ void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) 
     }
 }
 
-bool STREAMBenchGenerator::isFinished() {
-    return (i == n);
-}
+bool STREAMBenchGenerator::isFinished() { return (i == n); }
 
-void STREAMBenchGenerator::completed() {
-
-}
+void STREAMBenchGenerator::completed() {}

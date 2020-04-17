@@ -13,7 +13,6 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
 #ifndef _H_SST_MIRANDA_EMPTY_GEN
 #define _H_SST_MIRANDA_EMPTY_GEN
 
@@ -25,36 +24,28 @@
 using namespace SST::RNG;
 
 namespace SST {
-    namespace Miranda {
+namespace Miranda {
 
-        class EmptyGenerator : public RequestGenerator {
+class EmptyGenerator : public RequestGenerator {
 
-        public:
-            EmptyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {}
+  public:
+    EmptyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {}
 
-            ~EmptyGenerator() {}
+    ~EmptyGenerator() override = default;
 
-            void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+    void generate(MirandaRequestQueue<GeneratorRequest *> *) override {}
 
-            bool isFinished() { return true; }
+    bool isFinished() override { return true; }
 
-            void completed() {}
+    void completed() override {}
 
-            SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
-                    EmptyGenerator,
-                    "miranda",
-                    "EmptyGenerator",
-                    SST_ELI_ELEMENT_VERSION(1, 0, 0),
-                    "Creates an empty (null) generator",
-                    SST::Miranda::RequestGenerator
-            )
+    SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(EmptyGenerator, "miranda", "EmptyGenerator", SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                                          "Creates an empty (null) generator", SST::Miranda::RequestGenerator)
 
-            SST_ELI_DOCUMENT_PARAMS(
-            )
+    SST_ELI_DOCUMENT_PARAMS()
+};
 
-        };
-
-    }
-}
+} // namespace Miranda
+} // namespace SST
 
 #endif

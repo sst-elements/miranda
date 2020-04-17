@@ -13,21 +13,17 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
+#include "gupsgen.h"
 #include <sst/core/params.h>
 #include <sst/core/rng/marsaglia.h>
-#include "gupsgen.h"
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-GUPSGenerator::GUPSGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {
-    build(params);
-}
-
+GUPSGenerator::GUPSGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) { build(params); }
 
 void GUPSGenerator::build(Params &params) {
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("GUPSGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -65,8 +61,8 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     out->verbose(CALL_INFO, 4, 0, "Generating next request number: %" PRIu64 " at address %" PRIu64 "\n", issueCount,
                  addr);
 
-    MemoryOpRequest *readAddr = new MemoryOpRequest(addr, reqLength, READ);
-    MemoryOpRequest *writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
+    auto *readAddr = new MemoryOpRequest(addr, reqLength, READ);
+    auto *writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
 
     writeAddr->addDependency(readAddr->getRequestID());
 
@@ -76,10 +72,6 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     issueCount--;
 }
 
-bool GUPSGenerator::isFinished() {
-    return (issueCount == 0);
-}
+bool GUPSGenerator::isFinished() { return (issueCount == 0); }
 
-void GUPSGenerator::completed() {
-
-}
+void GUPSGenerator::completed() {}

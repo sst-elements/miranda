@@ -13,22 +13,17 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-
-#include <sst/core/sst_config.h>
+#include "randomgen.h"
 #include <sst/core/params.h>
 #include <sst/core/rng/marsaglia.h>
-#include "randomgen.h"
+#include <sst/core/sst_config.h>
 
 using namespace SST::Miranda;
 
-
-RandomGenerator::RandomGenerator(ComponentId_t id, Params &params) :
-        RequestGenerator(id, params) {
-    build(params);
-}
+RandomGenerator::RandomGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) { build(params); }
 
 void RandomGenerator::build(Params &params) {
-    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
+    const auto verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("RandomGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -43,7 +38,6 @@ void RandomGenerator::build(Params &params) {
     out->verbose(CALL_INFO, 1, 0, "Maximum address: %" PRIu64 "\n", maxAddr);
 
     issueOpFences = params.find<std::string>("issue_op_fences", "yes") == "yes";
-
 }
 
 RandomGenerator::~RandomGenerator() {
@@ -57,8 +51,8 @@ void RandomGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     const uint64_t rand_addr = rng->generateNextUInt64();
     // Ensure we have a reqLength aligned request
     const uint64_t addr_under_limit = (rand_addr % maxAddr);
-    const uint64_t addr = (addr_under_limit < reqLength) ? addr_under_limit :
-                          (rand_addr % maxAddr) - (rand_addr % reqLength);
+    const uint64_t addr =
+        (addr_under_limit < reqLength) ? addr_under_limit : (rand_addr % maxAddr) - (rand_addr % reqLength);
 
     const double op_decide = rng->nextUniform();
 
@@ -72,10 +66,6 @@ void RandomGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     issueCount--;
 }
 
-bool RandomGenerator::isFinished() {
-    return (issueCount == 0);
-}
+bool RandomGenerator::isFinished() { return (issueCount == 0); }
 
-void RandomGenerator::completed() {
-
-}
+void RandomGenerator::completed() {}

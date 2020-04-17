@@ -1,3 +1,5 @@
+MAKEFLAGS += --no-print-directory
+
 CXX = $(shell sst-config --CXX)
 CXXFLAGS  = $(shell sst-config --ELEMENT_CXXFLAGS)
 INCLUDES  =
@@ -22,20 +24,15 @@ ifdef stake
     SRCS += generators/stake.cc
 endif
 
--include $(DEP)
-.build/%.o: %.cc
-	@mkdir -p $(@D)
-	@echo "$(CXX) | $(CXXFLAGS) | $(INCLUDES) | -MMD -c | $< | -o | $@"
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -c $< -o $@
-
-libmiranda.so: $(OBJ)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(LDFLAGS) -o $@ $^ $(LIBRARIES)
-
-install: libmiranda.so
+.PHONY: install
+.ONESHELL:
+install:
+	mkdir -p build
+	cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. && make
 	sst-register miranda miranda_LIBDIR=$(CURDIR)
 
 uninstall:
 	sst-register -u miranda
 
 clean: uninstall
-	rm -rf .build libmiranda.so
+	rm -rf build libmiranda.so
