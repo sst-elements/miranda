@@ -1,8 +1,8 @@
-// Copyright 2009-2019 NTESS. Under the terms
+// Copyright 2009-2020 NTESS. Under the terms
 // of Contract DE-NA0003525 with NTESS, the U.S.
 // Government retains certain rights in this software.
 //
-// Copyright (c) 2009-2019, NTESS
+// Copyright (c) 2009-2020, NTESS
 // All rights reserved.
 //
 // Portions are copyright of other developers:
@@ -13,37 +13,34 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-#include "revsinglestream.h"
 
-#include <sst/core/params.h>
 #include <sst/core/sst_config.h>
+#include <sst/core/params.h>
+#include "revsinglestream.h"
 
 using namespace SST::Miranda;
 
-ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(Component *owner, Params &params)
-    : RequestGenerator(owner, params) {
-    build(params);
-}
 
-ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(ComponentId_t id, Params &params)
-    : RequestGenerator(id, params) {
+ReverseSingleStreamGenerator::ReverseSingleStreamGenerator(ComponentId_t id, Params &params) :
+        RequestGenerator(id, params) {
     build(params);
 }
 
 void ReverseSingleStreamGenerator::build(Params &params) {
-    const auto verbose = params.find<uint32_t>("verbose", 0);
 
-    out = new Output("ReverseSingleStreamGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
+    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
 
-    stopIndex = params.find<uint64_t>("stop_at", 0);
-    startIndex = params.find<uint64_t>("start_at", 1024);
+    //out = new Output("ReverseSingleStreamGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
+    out = new Output("ReverseSingleStreamGenerator[@p]: ", verbose, 0, Output::STDOUT);
+
+    stopIndex = params.find<uint64_t>("stopat", 0);
+    startIndex = params.find<uint64_t>("startat", 1024);
     datawidth = params.find<uint64_t>("datawidth", 8);
     stride = params.find<uint64_t>("stride", 1);
 
     if (startIndex < stopIndex) {
         out->fatal(CALL_INFO, -1,
-                   "Start address (%" PRIu64 ") must be greater than stop address (%" PRIu64
-                   ") in reverse stream generator",
+                   "Start address (%" PRIu64 ") must be greater than stop address (%" PRIu64 ") in reverse stream generator",
                    startIndex, stopIndex);
     }
 
@@ -55,7 +52,9 @@ void ReverseSingleStreamGenerator::build(Params &params) {
     nextIndex = startIndex;
 }
 
-ReverseSingleStreamGenerator::~ReverseSingleStreamGenerator() { delete out; }
+ReverseSingleStreamGenerator::~ReverseSingleStreamGenerator() {
+    delete out;
+}
 
 void ReverseSingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     out->verbose(CALL_INFO, 4, 0, "Generating next request at address: %" PRIu64 "\n", nextIndex);
@@ -66,6 +65,10 @@ void ReverseSingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest
     nextIndex = nextIndex - stride;
 }
 
-bool ReverseSingleStreamGenerator::isFinished() { return (nextIndex == stopIndex); }
+bool ReverseSingleStreamGenerator::isFinished() {
+    return (nextIndex == stopIndex);
+}
 
-void ReverseSingleStreamGenerator::completed() {}
+void ReverseSingleStreamGenerator::completed() {
+
+}

@@ -1,8 +1,8 @@
-// Copyright 2009-2019 NTESS. Under the terms
+// Copyright 2009-2020 NTESS. Under the terms
 // of Contract DE-NA0003525 with NTESS, the U.S.
 // Government retains certain rights in this software.
 //
-// Copyright (c) 2009-2019, NTESS
+// Copyright (c) 2009-2020, NTESS
 // All rights reserved.
 //
 // Portions are copyright of other developers:
@@ -13,25 +13,27 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-#include "stake.h"
 
-#include <sst/core/params.h>
 #include <sst/core/sst_config.h>
+#include <sst/core/params.h>
+#include <generators/stake.h>
 
 using namespace SST::Miranda;
 
 Stake *__GStake;
 
-Stake::Stake(Component *owner, Params &params) : RequestGenerator(owner, params) { build(params); }
+Stake::Stake(ComponentId_t id, Params &params)
+        : RequestGenerator(id, params) {
+    build(params);
+}
 
-Stake::Stake(ComponentId_t id, Params &params) : RequestGenerator(id, params) { build(params); }
 
 void Stake::build(Params &params) {
     // default parameters
-    spike = nullptr;
+    spike = NULL;
     rtn = 0;
 
-    const auto verbose = params.find<uint32_t>("verbose", 0);
+    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("Stake[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -82,47 +84,66 @@ std::vector<std::pair<reg_t, mem_t *>> Stake::make_mems(const char *arg) {
     auto mb = strtoull(arg, &p, 0);
     if (*p == 0) {
         reg_t size = reg_t(mb) << 20;
-        if (size != (size_t)size)  // condition is always false...?
+        if (size != (size_t) size)
             out->fatal(CALL_INFO, -1, "Memsize would overflow size_t");
-        return std::vector<std::pair<reg_t, mem_t *>>(
-            1, std::make_pair(reg_t(DRAM_BASE), new mem_t(size)));
+        return std::vector<std::pair<reg_t, mem_t *>>(1, std::make_pair(reg_t(DRAM_BASE), new mem_t(size)));
     }
 
     // handle base/size tuples
     std::vector<std::pair<reg_t, mem_t *>> res;
     while (true) {
         auto base = strtoull(arg, &p, 0);
-        if (!*p || *p != ':') out->fatal(CALL_INFO, -1, "Failed to parse memory string");
+        if (!*p || *p != ':')
+            out->fatal(CALL_INFO, -1, "Failed to parse memory string");
         auto size = strtoull(p + 1, &p, 0);
-        if ((size | base) % PGSIZE != 0) out->fatal(CALL_INFO, -1, "Failed to parse memory string");
+        if ((size | base) % PGSIZE != 0)
+            out->fatal(CALL_INFO, -1, "Failed to parse memory string");
         res.push_back(std::make_pair(reg_t(base), new mem_t(size)));
-        if (!*p) break;
-        if (*p != ',') out->fatal(CALL_INFO, -1, "Failed to parse memory string");
+        if (!*p)
+            break;
+        if (*p != ',')
+            out->fatal(CALL_INFO, -1, "Failed to parse memory string");
         arg = p + 1;
     }
     return res;
 }
 
-extern "C" void SR(uint64_t addr, uint32_t reqLength, bool Read, bool Write, bool Atomic,
-                   bool Custom, uint32_t Code) {
+extern "C" void SR(uint64_t addr,
+                   uint32_t reqLength,
+                   bool Read,
+                   bool Write,
+                   bool Atomic,
+                   bool Custom,
+                   uint32_t Code) {
     __GStake->StakeRequest(addr, reqLength, Read, Write, Atomic, Custom, Code);
 }
 
-void Stake::StakeRequest(uint64_t addr, uint32_t reqLength, bool Read, bool Write, bool Atomic,
-                         bool Custom, uint32_t Code) {
+
+void Stake::StakeRequest(uint64_t addr,
+                         uint32_t reqLength,
+                         bool Read,
+                         bool Write,
+                         bool Atomic,
+                         bool Custom,
+                         uint32_t Code) {
+
     MemoryOpRequest *req = NULL;
     if (Read) {
         req = new MemoryOpRequest(addr, reqLength, READ);
-        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n", addr);
+        out->verbose(CALL_INFO, 8, 0,
+                     "Issuing READ request for address %" PRIu64 "\n", addr);
     } else if (Write) {
         req = new MemoryOpRequest(addr, reqLength, WRITE);
-        out->verbose(CALL_INFO, 8, 0, "Issuing WRITE request for address %" PRIu64 "\n", addr);
+        out->verbose(CALL_INFO, 8, 0,
+                     "Issuing WRITE request for address %" PRIu64 "\n", addr);
     } else if (Atomic) {
         req = new MemoryOpRequest(addr, reqLength, READ);
-        out->verbose(CALL_INFO, 8, 0, "Issuing ATOMIC request for address %" PRIu64 "\n", addr);
+        out->verbose(CALL_INFO, 8, 0,
+                     "Issuing ATOMIC request for address %" PRIu64 "\n", addr);
     } else if (Custom) {
         req = new MemoryOpRequest(addr, reqLength, READ);
-        out->verbose(CALL_INFO, 8, 0, "Issuing CUSTOM request for address %" PRIu64 "\n", addr);
+        out->verbose(CALL_INFO, 8, 0,
+                     "Issuing CUSTOM request for address %" PRIu64 "\n", addr);
     } else {
         out->fatal(CALL_INFO, -1, "Unkown request type");
     }
@@ -131,13 +152,14 @@ void Stake::StakeRequest(uint64_t addr, uint32_t reqLength, bool Read, bool Writ
 }
 
 void Stake::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
+
     // save the request queue for later
     MQ = q;
 
     // setup the input variables
     std::vector<std::pair<reg_t, mem_t *>> mems = make_mems(msize.c_str());
     std::vector<std::string> htif_args;
-    std::vector<int> hartids;  // null hartid vector
+    std::vector<int> hartids; // null hartid vector
 
     // initiate the spike simulator
     htif_args.push_back(pk);
@@ -163,14 +185,14 @@ void Stake::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
         out->verbose(CALL_INFO, 4, 0, "HTIF_ARGS[%d] = %s\n", j, htif_args[j].c_str());
     }
 
-    spike =
-        new sim_t(isa.c_str(), cores, false, (reg_t)(pc), mems, htif_args, hartids, 2, 0, false);
+    spike = new sim_t(isa.c_str(), cores, false, (reg_t)(pc),
+                      mems, htif_args, hartids, 2, 0, false);
 
     // setup the pre-runtime parameters
     spike->set_debug(false);
     spike->set_log(log);
     spike->set_histogram(false);
-    spike->set_sst_func((void *)(&SR));
+    spike->set_sst_func((void *) (&SR));
 
     // run the sim
     rtn = spike->run();
@@ -178,6 +200,9 @@ void Stake::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     done = true;
 }
 
-bool Stake::isFinished() { return done; }
+bool Stake::isFinished() {
+    return done;
+}
 
-void Stake::completed() {}
+void Stake::completed() {
+}

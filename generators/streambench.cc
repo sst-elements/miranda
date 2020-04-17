@@ -1,8 +1,8 @@
-// Copyright 2009-2019 NTESS. Under the terms
+// Copyright 2009-2020 NTESS. Under the terms
 // of Contract DE-NA0003525 with NTESS, the U.S.
 // Government retains certain rights in this software.
 //
-// Copyright (c) 2009-2019, NTESS
+// Copyright (c) 2009-2020, NTESS
 // All rights reserved.
 //
 // Portions are copyright of other developers:
@@ -13,25 +13,21 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-#include "streambench.h"
 
-#include <sst/core/params.h>
 #include <sst/core/sst_config.h>
+#include <sst/core/params.h>
+#include "streambench.h"
 
 using namespace SST::Miranda;
 
-STREAMBenchGenerator::STREAMBenchGenerator(Component *owner, Params &params)
-    : RequestGenerator(owner, params) {
-    build(params);
-}
 
-STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params)
-    : RequestGenerator(id, params) {
+STREAMBenchGenerator::STREAMBenchGenerator(ComponentId_t id, Params &params) :
+        RequestGenerator(id, params) {
     build(params);
 }
 
 void STREAMBenchGenerator::build(Params &params) {
-    const auto verbose = params.find<uint32_t>("verbose", 0);
+    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("STREAMBenchGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -60,7 +56,9 @@ void STREAMBenchGenerator::build(Params &params) {
     out->verbose(CALL_INFO, 1, 0, "N-per-generate     %" PRIu64 "\n", n_per_call);
 }
 
-STREAMBenchGenerator::~STREAMBenchGenerator() { delete out; }
+STREAMBenchGenerator::~STREAMBenchGenerator() {
+    delete out;
+}
 
 void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     for (uint64_t j = 0; j < n_per_call; ++j) {
@@ -71,29 +69,30 @@ void STREAMBenchGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) 
             break;
         }
 
-        auto read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
-        auto read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
-        auto write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
+        MemoryOpRequest *read_b = new MemoryOpRequest(start_b + (i * reqLength), reqLength, READ);
+        MemoryOpRequest *read_c = new MemoryOpRequest(start_c + (i * reqLength), reqLength, READ);
+        MemoryOpRequest *write_a = new MemoryOpRequest(start_a + (i * reqLength), reqLength, WRITE);
 
         write_a->addDependency(read_b->getRequestID());
         write_a->addDependency(read_c->getRequestID());
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n",
-                     (start_b + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n", (start_b + (i * reqLength)));
         q->push_back(read_b);
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n",
-                     (start_c + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing READ request for address %" PRIu64 "\n", (start_c + (i * reqLength)));
         q->push_back(read_c);
 
-        out->verbose(CALL_INFO, 8, 0, "Issuing WRITE request for address %" PRIu64 "\n",
-                     (start_a + (i * reqLength)));
+        out->verbose(CALL_INFO, 8, 0, "Issuing WRITE request for address %" PRIu64 "\n", (start_a + (i * reqLength)));
         q->push_back(write_a);
 
         i++;
     }
 }
 
-bool STREAMBenchGenerator::isFinished() { return (i == n); }
+bool STREAMBenchGenerator::isFinished() {
+    return (i == n);
+}
 
-void STREAMBenchGenerator::completed() {}
+void STREAMBenchGenerator::completed() {
+
+}

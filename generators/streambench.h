@@ -1,8 +1,8 @@
-// Copyright 2009-2019 NTESS. Under the terms
+// Copyright 2009-2020 NTESS. Under the terms
 // of Contract DE-NA0003525 with NTESS, the U.S.
 // Government retains certain rights in this software.
 //
-// Copyright (c) 2009-2019, NTESS
+// Copyright (c) 2009-2020, NTESS
 // All rights reserved.
 //
 // Portions are copyright of other developers:
@@ -13,64 +13,68 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
+
 #ifndef _H_SST_MIRANDA_STREAM_BENCH_GEN
 #define _H_SST_MIRANDA_STREAM_BENCH_GEN
 
+#include "../mirandaGenerator.h"
 #include <sst/core/output.h>
 
 #include <queue>
 
-#include "../mirandaGenerator.h"
-
 namespace SST {
-namespace Miranda {
+    namespace Miranda {
 
-class STREAMBenchGenerator : public RequestGenerator {
-   public:
-    STREAMBenchGenerator(Component *owner, Params &params);
+        class STREAMBenchGenerator : public RequestGenerator {
 
-    STREAMBenchGenerator(ComponentId_t id, Params &params);
+        public:
+            STREAMBenchGenerator(ComponentId_t id, Params &params);
 
-    void build(Params &params);
+            void build(Params &params);
 
-    ~STREAMBenchGenerator() override;
+            ~STREAMBenchGenerator();
 
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
+            void generate(MirandaRequestQueue<GeneratorRequest *> *q);
 
-    auto isFinished() -> bool override;
+            bool isFinished();
 
-    void completed() override;
+            void completed();
 
-    SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(STREAMBenchGenerator, "miranda", "STREAMBenchGenerator",
-                                          SST_ELI_ELEMENT_VERSION(1, 0, 0),
-                                          "Creates a representation of the STREAM benchmark",
-                                          SST::Miranda::RequestGenerator)
+            SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
+                    STREAMBenchGenerator,
+                    "miranda",
+                    "STREAMBenchGenerator",
+                    SST_ELI_ELEMENT_VERSION(1, 0, 0),
+                    "Creates a representation of the STREAM benchmark",
+                    SST::Miranda::RequestGenerator
+            )
 
-    SST_ELI_DOCUMENT_PARAMS(
-        {"verbose", "Sets the verbosity output of the generator", "0"},
-        {"n", "Sets the number of elements in the STREAM arrays", "10000"},
-        {"n_per_call",
-         "Sets the number of iterations to generate per call to the generation function", "1"},
-        {"operandwidth", "Sets the length of the request, default=8 (i.e. one double)", "8"},
-        {"start_a", "Sets the start address of the array a", "0"},
-        {"start_b", "Sets the start address of the array b", "1024"},
-        {"start_c", "Sets the start address of the array c", "2048"})
+            SST_ELI_DOCUMENT_PARAMS(
+                    { "verbose", "Sets the verbosity output of the generator", "0" },
+                    { "n", "Sets the number of elements in the STREAM arrays", "10000" },
+                    { "n_per_call", "Sets the number of iterations to generate per call to the generation function", "1" },
+                    { "operandwidth", "Sets the length of the request, default=8 (i.e. one double)", "8" },
+                    { "start_a", "Sets the start address of the array a", "0" },
+                    { "start_b", "Sets the start address of the array b", "1024" },
+                    { "start_c", "Sets the start address of the array c", "2048" }
+            )
 
-   private:
-    uint64_t reqLength{};
+        private:
+            uint64_t reqLength;
 
-    uint64_t start_a{};
-    uint64_t start_b{};
-    uint64_t start_c{};
+            uint64_t start_a;
+            uint64_t start_b;
+            uint64_t start_c;
 
-    uint64_t n{};
-    uint64_t n_per_call{};
-    uint64_t i{};
+            uint64_t n;
+            uint64_t n_per_call;
+            uint64_t i;
 
-    Output *out{};
-};
+            Output *out;
 
-}  // namespace Miranda
-}  // namespace SST
+        };
+
+    }
+}
 
 #endif

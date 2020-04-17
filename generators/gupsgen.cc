@@ -1,8 +1,8 @@
-// Copyright 2009-2019 NTESS. Under the terms
+// Copyright 2009-2020 NTESS. Under the terms
 // of Contract DE-NA0003525 with NTESS, the U.S.
 // Government retains certain rights in this software.
 //
-// Copyright (c) 2009-2019, NTESS
+// Copyright (c) 2009-2020, NTESS
 // All rights reserved.
 //
 // Portions are copyright of other developers:
@@ -13,11 +13,11 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-#include "gupsgen.h"
 
+#include <sst/core/sst_config.h>
 #include <sst/core/params.h>
 #include <sst/core/rng/marsaglia.h>
-#include <sst/core/sst_config.h>
+#include "gupsgen.h"
 
 using namespace SST::Miranda;
 
@@ -25,12 +25,9 @@ GUPSGenerator::GUPSGenerator(ComponentId_t id, Params &params) : RequestGenerato
     build(params);
 }
 
-GUPSGenerator::GUPSGenerator(Component *owner, Params &params) : RequestGenerator(owner, params) {
-    build(params);
-}
 
 void GUPSGenerator::build(Params &params) {
-    const auto verbose = params.find<uint32_t>("verbose", 0);
+    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("GUPSGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -57,6 +54,7 @@ GUPSGenerator::~GUPSGenerator() {
 }
 
 void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
+
     const uint64_t rand_addr = rng->generateNextUInt64();
     // Ensure we have a reqLength aligned request
 
@@ -64,12 +62,11 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     addr *= reqLength;
     addr += memStart;
 
-    out->verbose(CALL_INFO, 4, 0,
-                 "Generating next request number: %" PRIu64 " at address %" PRIu64 "\n", issueCount,
+    out->verbose(CALL_INFO, 4, 0, "Generating next request number: %" PRIu64 " at address %" PRIu64 "\n", issueCount,
                  addr);
 
-    auto readAddr = new MemoryOpRequest(addr, reqLength, READ);
-    auto writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
+    MemoryOpRequest *readAddr = new MemoryOpRequest(addr, reqLength, READ);
+    MemoryOpRequest *writeAddr = new MemoryOpRequest(addr, reqLength, WRITE);
 
     writeAddr->addDependency(readAddr->getRequestID());
 
@@ -79,6 +76,10 @@ void GUPSGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     issueCount--;
 }
 
-bool GUPSGenerator::isFinished() { return (issueCount == 0); }
+bool GUPSGenerator::isFinished() {
+    return (issueCount == 0);
+}
 
-void GUPSGenerator::completed() {}
+void GUPSGenerator::completed() {
+
+}

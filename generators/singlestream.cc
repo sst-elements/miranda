@@ -1,8 +1,8 @@
-// Copyright 2009-2019 NTESS. Under the terms
+// Copyright 2009-2020 NTESS. Under the terms
 // of Contract DE-NA0003525 with NTESS, the U.S.
 // Government retains certain rights in this software.
 //
-// Copyright (c) 2009-2019, NTESS
+// Copyright (c) 2009-2020, NTESS
 // All rights reserved.
 //
 // Portions are copyright of other developers:
@@ -13,24 +13,22 @@
 // information, see the LICENSE file in the top level directory of the
 // distribution.
 
-#include "singlestream.h"
 
+#include <sst/core/sst_config.h>
 #include <sst/core/params.h>
+#include "singlestream.h"
 
 using namespace SST::Miranda;
 
-SingleStreamGenerator::SingleStreamGenerator(Component *owner, Params &params)
-    : RequestGenerator(owner, params) {
-    build(params);
-}
 
-SingleStreamGenerator::SingleStreamGenerator(ComponentId_t id, Params &params)
-    : RequestGenerator(id, params) {
+SingleStreamGenerator::SingleStreamGenerator(ComponentId_t id, Params &params) :
+        RequestGenerator(id, params) {
     build(params);
 }
 
 void SingleStreamGenerator::build(Params &params) {
-    const auto verbose = params.find<uint32_t>("verbose", 0);
+
+    const uint32_t verbose = params.find<uint32_t>("verbose", 0);
 
     out = new Output("SingleStreamGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
@@ -42,22 +40,24 @@ void SingleStreamGenerator::build(Params &params) {
     nextAddr = startAddr;
 
     std::string op = params.find<std::string>("memOp", "Read");
-    if (!(op == "Read")) {
+    if (!op.compare("Read")) {
         memOp = READ;
-    } else if (!(op == "Write")) {
+    } else if (!op.compare("Write")) {
         memOp = WRITE;
     } else {
         assert(0);
     }
 
-    out->verbose(CALL_INFO, 1, 0, "Will issue %" PRIu64 " %s operations\n", issueCount,
-                 memOp == READ ? "Read" : "Write");
+    out->verbose(CALL_INFO, 1, 0, "Will issue %" PRIu64 " %s operations\n",
+                 issueCount, memOp == READ ? "Read" : "Write");
     out->verbose(CALL_INFO, 1, 0, "Request lengths: %" PRIu64 " bytes\n", reqLength);
     out->verbose(CALL_INFO, 1, 0, "Maximum address: %" PRIx64 "\n", maxAddr);
     out->verbose(CALL_INFO, 1, 0, "First address: %" PRIx64 "\n", nextAddr);
 }
 
-SingleStreamGenerator::~SingleStreamGenerator() { delete out; }
+SingleStreamGenerator::~SingleStreamGenerator() {
+    delete out;
+}
 
 void SingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q) {
     out->verbose(CALL_INFO, 4, 0, "Generating next request number: %" PRIu64 "\n", issueCount);
@@ -66,11 +66,16 @@ void SingleStreamGenerator::generate(MirandaRequestQueue<GeneratorRequest *> *q)
 
     // What is the next address?
     nextAddr = (nextAddr + reqLength) % maxAddr;
-    if (nextAddr == 0) nextAddr = startAddr;
+    if (nextAddr == 0)
+        nextAddr = startAddr;
 
     issueCount--;
 }
 
-bool SingleStreamGenerator::isFinished() { return (issueCount == 0); }
+bool SingleStreamGenerator::isFinished() {
+    return (issueCount == 0);
+}
 
-void SingleStreamGenerator::completed() {}
+void SingleStreamGenerator::completed() {
+
+}

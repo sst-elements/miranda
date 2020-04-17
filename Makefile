@@ -25,6 +25,7 @@ endif
 -include $(DEP)
 .build/%.o: %.cc
 	@mkdir -p $(@D)
+	@echo "$(CXX) | $(CXXFLAGS) | $(INCLUDES) | -MMD -c | $< | -o | $@"
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -c $< -o $@
 
 libmiranda.so: $(OBJ)
