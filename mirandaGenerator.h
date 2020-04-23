@@ -33,9 +33,7 @@ class GeneratorRequest {
     GeneratorRequest() { reqID = nextGeneratorRequestID++; }
 
     virtual ~GeneratorRequest() = default;
-
     virtual ReqOperation getOperation() const = 0;
-
     uint64_t getRequestID() const { return reqID; }
 
     void addDependency(uint64_t depReq) { dependsOn.push_back(depReq); }
@@ -75,7 +73,6 @@ template <typename QueueType> class MirandaRequestQueue {
         maxCapacity = 16;
         curSize = 0;
     }
-
     ~MirandaRequestQueue() { free(theQ); }
 
     bool empty() const { return 0 == curSize; }
@@ -152,19 +149,12 @@ class MemoryOpRequest : public GeneratorRequest {
   public:
     MemoryOpRequest(const uint64_t cAddr, const uint64_t cLength, const ReqOperation cOpType)
         : GeneratorRequest(), addr(cAddr), length(cLength), op(cOpType) {}
-
     ~MemoryOpRequest() override = default;
-
     ReqOperation getOperation() const override { return op; }
-
     bool isRead() const { return op == READ; }
-
     bool isWrite() const { return op == WRITE; }
-
     bool isCustom() const { return op == CUSTOM; }
-
     uint64_t getAddress() const { return addr; }
-
     uint64_t getLength() const { return length; }
 
   protected:
@@ -179,9 +169,7 @@ class CustomOpRequest : public MemoryOpRequest {
         : MemoryOpRequest(cAddr, cLength, CUSTOM) {
         opcode = cOpcode;
     }
-
     ~CustomOpRequest() override = default;
-
     uint32_t getOpcode() const { return opcode; }
 
   protected:
@@ -191,9 +179,7 @@ class CustomOpRequest : public MemoryOpRequest {
 class FenceOpRequest : public GeneratorRequest {
   public:
     FenceOpRequest() : GeneratorRequest() {}
-
     ~FenceOpRequest() override = default;
-
     ReqOperation getOperation() const override { return REQ_FENCE; }
 };
 
@@ -203,13 +189,9 @@ class RequestGenerator : public SubComponent {
     SST_ELI_REGISTER_SUBCOMPONENT_API(SST::Miranda::RequestGenerator)
 
     RequestGenerator(ComponentId_t id, Params & /*params*/) : SubComponent(id) {}
-
     ~RequestGenerator() override = default;
-
-    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *) {}
-
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
     virtual bool isFinished() { return true; }
-
     virtual void completed() {}
 };
 

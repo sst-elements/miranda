@@ -1,0 +1,72 @@
+In file included from /home/sabbir/sst-elements-org/miranda/generators/gupsgen.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/gupsgen.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/generators/singlestream.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/singlestream.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/generators/stencil3dbench.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/stencil3dbench.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/generators/streambench.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/streambench.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/generators/streambench_customcmd.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/streambench_customcmd.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/generators/randomgen.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/randomgen.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/generators/revsinglestream.cc:16:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/revsinglestream.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+1 warning generated.
+In file included from /home/sabbir/sst-elements-org/miranda/mirandaCPU.cc:22:
+In file included from /home/sabbir/sst-elements-org/miranda/mirandaCPU.h:24:
+/home/sabbir/sst-elements-org/miranda/mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+/home/sabbir/sst-elements-org/miranda/mirandaCPU.cc:31:22: warning: field 'srcLink' will be initialized after field 'reqGen' [-Wreorder]
+    : Component(id), srcLink(nullptr), reqGen(nullptr) {
+                     ^
+/home/sabbir/sst-elements-org/miranda/mirandaCPU.cc:437:44: warning: comparison of integers of different signs: 'int' and 'uint32_t' (aka 'unsigned int') [-Wsign-compare]
+    for (int i = pendingRequests.size(); i < maxOpLookup; ++i) {
+                                         ~ ^ ~~~~~~~~~~~
+3 warnings generated.
+In file included from /home/sabbir/sst-elements-org/miranda/mirandaIncGen.cc:18:
+In file included from /home/sabbir/sst-elements-org/miranda/generators/copygen.h:19:
+/home/sabbir/sst-elements-org/miranda/generators/../mirandaGenerator.h:193:68: warning: unused parameter 'q' [-Wunused-parameter]
+    virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+                                                                   ^
+In file included from /home/sabbir/sst-elements-org/miranda/mirandaIncGen.cc:18:
+/home/sabbir/sst-elements-org/miranda/generators/copygen.h:58:27: warning: comparison of integers of different signs: 'int' and 'uint64_t' (aka 'unsigned long') [-Wsign-compare]
+        for (int i = 0; i < n_per_call; i++) {
+                        ~ ^ ~~~~~~~~~~
+In file included from /home/sabbir/sst-elements-org/miranda/mirandaIncGen.cc:21:
+/home/sabbir/sst-elements-org/miranda/generators/nullgen.h:34:60: warning: unused parameter 'q' [-Wunused-parameter]
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override {}
+                                                           ^
+In file included from /home/sabbir/sst-elements-org/miranda/mirandaIncGen.cc:25:
+/home/sabbir/sst-elements-org/miranda/generators/spmvgen.h:147:83: warning: missing field 'defaultValue' initializer [-Wmissing-field-initializers]
+                            {"iterations", "Sets the number of repeats to perform"},
+                                                                                  ^
+4 warnings generated.

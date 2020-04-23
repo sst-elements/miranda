@@ -28,15 +28,10 @@ class STREAMBenchGenerator : public RequestGenerator {
 
   public:
     STREAMBenchGenerator(ComponentId_t id, Params &params);
-
     void build(Params &params);
-
     ~STREAMBenchGenerator() override;
-
     void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-
     bool isFinished() override;
-
     void completed() override;
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(STREAMBenchGenerator, "miranda", "STREAMBenchGenerator",

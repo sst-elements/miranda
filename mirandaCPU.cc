@@ -28,7 +28,7 @@ std::atomic<uint64_t> SST::Miranda::GeneratorRequest::nextGeneratorRequestID(0);
 using namespace SST::Miranda;
 
 RequestGenCPU::RequestGenCPU(SST::ComponentId_t id, SST::Params &params)
-    : Component(id), reqGen(nullptr), srcLink(nullptr) {
+    : Component(id), srcLink(nullptr), reqGen(nullptr) {
 
     const int verbose = params.find<int>("verbose", 0);
     std::stringstream prefix;
@@ -188,7 +188,7 @@ void RequestGenCPU::init(unsigned int phase) { cache_link->init(phase); }
 
 void RequestGenCPU::handleSrcEvent(Event *ev) {
 
-    auto *event = dynamic_cast<MirandaReqEvent *>(ev);
+    auto *event = static_cast<MirandaReqEvent *>(ev);
 
     out->verbose(CALL_INFO, 2, 0, "got %lu generators\n", event->generators.size());
     loadGenerator(event);
@@ -313,7 +313,7 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
         SimpleMem::Request *reqUpper;
 
         if (isCustom) {
-            auto *creq = dynamic_cast<CustomOpRequest *>(req);
+            auto *creq = static_cast<CustomOpRequest *>(req);
             // build a custom request event
             reqLower = new SimpleMem::Request(SimpleMem::Request::CustomCmd, lowerAddress, lowerLength,
                                               creq->getOpcode(), 0, 0);
@@ -352,7 +352,7 @@ void RequestGenCPU::issueRequest(MemoryOpRequest *req) {
         // This is not a split load, i.e. issue in a single transaction
         SimpleMem::Request *request;
         if (isCustom) {
-            auto *creq = dynamic_cast<CustomOpRequest *>(req);
+            auto *creq = static_cast<CustomOpRequest *>(req);
             // issue custom request
             request = new SimpleMem::Request(SimpleMem::Request::CustomCmd, memMgr->mapAddress(reqAddress), reqLength,
                                              creq->getOpcode(), 0, 0);
@@ -387,7 +387,7 @@ bool RequestGenCPU::clockTick(SST::Cycle_t /*cycle*/) {
     statCycles->addData(1);
 
     if (reqGen->isFinished()) {
-        if ((pendingRequests.empty()) && (0 == requestsPending[READ]) && (0 == requestsPending[WRITE]) &&
+        if ((pendingRequests.size() == 0) && (0 == requestsPending[READ]) && (0 == requestsPending[WRITE]) &&
             (0 == requestsPending[CUSTOM])) {
             out->verbose(CALL_INFO, 4, 0, "Request generator complete and no requests pending, simulation can halt.\n");
 
@@ -460,7 +460,7 @@ bool RequestGenCPU::clockTick(SST::Cycle_t /*cycle*/) {
         GeneratorRequest *nxtRq = pendingRequests.at(i);
 
         if (nxtRq->getOperation() == REQ_FENCE) {
-            if (requestsInFlight.empty()) {
+            if (0 == requestsInFlight.size()) {
                 out->verbose(CALL_INFO, 4, 0, "Fence operation completed, no pending requests, will be retired.\n");
 
                 // Keep record we will delete fence at i

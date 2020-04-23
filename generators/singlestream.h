@@ -28,15 +28,10 @@ class SingleStreamGenerator : public RequestGenerator {
 
   public:
     SingleStreamGenerator(ComponentId_t id, Params &params);
-
     void build(Params &params);
-
     ~SingleStreamGenerator() override;
-
     void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-
     bool isFinished() override;
-
     void completed() override;
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(SingleStreamGenerator, "miranda", "SingleStreamGenerator",

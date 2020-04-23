@@ -31,15 +31,10 @@ class GUPSGenerator : public RequestGenerator {
 
   public:
     GUPSGenerator(ComponentId_t id, Params &params);
-
     void build(Params &params);
-
     ~GUPSGenerator() override;
-
     void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-
     bool isFinished() override;
-
     void completed() override;
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(GUPSGenerator, "miranda", "GUPSGenerator", SST_ELI_ELEMENT_VERSION(1, 0, 0),

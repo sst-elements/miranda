@@ -28,15 +28,10 @@ class Stencil3DBenchGenerator : public RequestGenerator {
 
   public:
     Stencil3DBenchGenerator(ComponentId_t id, Params &params);
-
     void build(Params &params);
-
     ~Stencil3DBenchGenerator() override;
-
     void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-
     bool isFinished() override;
-
     void completed() override;
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(Stencil3DBenchGenerator, "miranda", "Stencil3DBenchGenerator",
@@ -58,7 +53,6 @@ class Stencil3DBenchGenerator : public RequestGenerator {
 
   private:
     void convertIndexToPosition(const uint32_t index, uint32_t *posX, uint32_t *posY, uint32_t *posZ);
-
     uint32_t convertPositionToIndex(const uint32_t posX, const uint32_t posY, const uint32_t posZ);
 
     uint32_t nX;

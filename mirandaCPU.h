@@ -34,19 +34,12 @@ namespace Miranda {
 class CPURequest {
   public:
     CPURequest(const uint64_t origID) : originalID(origID), issueTime(0), outstandingParts(0) {}
-
     void incPartCount() { outstandingParts++; }
-
     void decPartCount() { outstandingParts--; }
-
     bool completed() const { return 0 == outstandingParts; }
-
     void setIssueTime(const uint64_t now) { issueTime = now; }
-
     uint64_t getIssueTime() const { return issueTime; }
-
     uint64_t getOriginalReqID() const { return originalID; }
-
     uint32_t countParts() const { return outstandingParts; }
 
   protected:
@@ -58,9 +51,7 @@ class CPURequest {
 class RequestGenCPU : public SST::Component {
   public:
     RequestGenCPU(SST::ComponentId_t id, SST::Params &params);
-
     void finish() override;
-
     void init(unsigned int phase) override;
 
     SST_ELI_REGISTER_COMPONENT(RequestGenCPU, "miranda", "BaseCPU", SST_ELI_ELEMENT_VERSION(1, 0, 0),
@@ -120,15 +111,10 @@ class RequestGenCPU : public SST::Component {
     ~RequestGenCPU() override;
 
     void loadGenerator(MirandaReqEvent *);
-
     void loadGenerator(const std::string &name, SST::Params &params);
-
     void handleEvent(SimpleMem::Request *ev);
-
     bool clockTick(SST::Cycle_t);
-
     void issueRequest(MemoryOpRequest *req);
-
     void handleSrcEvent(SST::Event *);
 
     Output *out;

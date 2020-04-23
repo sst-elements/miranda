@@ -31,15 +31,10 @@ class RandomGenerator : public RequestGenerator {
 
   public:
     RandomGenerator(ComponentId_t id, Params &params);
-
     void build(Params &params);
-
     ~RandomGenerator() override;
-
     void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-
     bool isFinished() override;
-
     void completed() override;
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(RandomGenerator, "miranda", "RandomGenerator",
@@ -52,7 +47,6 @@ class RandomGenerator : public RequestGenerator {
                             {"length", "Length of requests", "8"},
                             {"max_address", "Maximum address allowed for generation", "16384"},
                             {"issue_op_fences", "Issue operation fences, \"yes\" or \"no\", default is yes", "yes"})
-
   private:
     uint64_t reqLength;
     uint64_t maxAddr;

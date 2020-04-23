@@ -146,7 +146,6 @@ class SPMVGenerator : public RequestGenerator {
                             {"matrix_element_start_addr", "Sets the start address of the elements array", "0"},
                             {"iterations", "Sets the number of repeats to perform"},
                             {"matrix_nnz_per_row", "Sets the number of non-zero elements per row", "9"})
-
   private:
     Output *out;
 

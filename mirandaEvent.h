@@ -53,7 +53,6 @@ class MirandaRspEvent : public SST::Event {
         Event::serialize_order(ser);
         ser &key;
     }
-
     ImplementSerializable(SST::Miranda::MirandaRspEvent);
 };
 
