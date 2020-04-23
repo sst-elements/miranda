@@ -32,7 +32,7 @@ class SPMVGenerator : public RequestGenerator {
     SPMVGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) { build(params); }
 
     void build(Params &params) {
-        const auto verbose = params.find<uint32_t>("verbose", 0);
+        const uint32_t verbose = params.find<uint32_t>("verbose", 0);
         out = new Output("SPMVGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
         matrixNx = params.find<uint64_t>("matrix_nx", 10);
@@ -70,22 +70,24 @@ class SPMVGenerator : public RequestGenerator {
         iterations = params.find<uint64_t>("iterations", 1);
     }
 
-    ~SPMVGenerator() override { delete out; }
+    ~SPMVGenerator() { delete out; }
 
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override {
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) {
         for (uint64_t row = localRowStart; row < localRowEnd; row++) {
             out->verbose(CALL_INFO, 2, 0, "Generating access for row %" PRIu64 "\n", row);
 
-            auto *readStart = new MemoryOpRequest(matrixRowIndicesStartAddr + (ordinalWidth * row), ordinalWidth, READ);
-            auto *readEnd =
+            MemoryOpRequest *readStart =
+                new MemoryOpRequest(matrixRowIndicesStartAddr + (ordinalWidth * row), ordinalWidth, READ);
+            MemoryOpRequest *readEnd =
                 new MemoryOpRequest(matrixRowIndicesStartAddr + (ordinalWidth * (row + 1)), ordinalWidth, READ);
 
             q->push_back(readStart);
             q->push_back(readEnd);
 
-            auto *readResultCurrentValue =
+            MemoryOpRequest *readResultCurrentValue =
                 new MemoryOpRequest(rhsVecStartAddr + (row * elementWidth), elementWidth, WRITE);
-            auto *writeResult = new MemoryOpRequest(rhsVecStartAddr + (row * elementWidth), elementWidth, WRITE);
+            MemoryOpRequest *writeResult =
+                new MemoryOpRequest(rhsVecStartAddr + (row * elementWidth), elementWidth, WRITE);
 
             writeResult->addDependency(readResultCurrentValue->getRequestID());
 
@@ -99,11 +101,12 @@ class SPMVGenerator : public RequestGenerator {
 
                 out->verbose(CALL_INFO, 4, 0, "Generating access for row %" PRIu64 ", column: %" PRIu64 "\n", row, col);
 
-                auto *readMatElement = new MemoryOpRequest(
+                MemoryOpRequest *readMatElement = new MemoryOpRequest(
                     matrixElementsStartAddr + (row * matrixNNZPerRow + j) * elementWidth, elementWidth, READ);
-                auto *readCol = new MemoryOpRequest(
+                MemoryOpRequest *readCol = new MemoryOpRequest(
                     matrixColumnIndicesStartAddr + (row * matrixNNZPerRow + j) * ordinalWidth, ordinalWidth, READ);
-                auto *readLHSElem = new MemoryOpRequest(lhsVecStartAddr + col * elementWidth, elementWidth, READ);
+                MemoryOpRequest *readLHSElem =
+                    new MemoryOpRequest(lhsVecStartAddr + col * elementWidth, elementWidth, READ);
 
                 readCol->addDependency(readStart->getRequestID());
                 readCol->addDependency(readEnd->getRequestID());
@@ -125,9 +128,9 @@ class SPMVGenerator : public RequestGenerator {
         iterations--;
     }
 
-    bool isFinished() override { return (0 == iterations); }
+    bool isFinished() { return (0 == iterations); }
 
-    void completed() override {}
+    void completed() {}
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(SPMVGenerator, "miranda", "SPMVGenerator", SST_ELI_ELEMENT_VERSION(1, 0, 0),
                                           "Creates a diagonal matrix access pattern", SST::Miranda::RequestGenerator)

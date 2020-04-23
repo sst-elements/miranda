@@ -29,10 +29,10 @@ class STREAMBenchGenerator_CustomCmd : public RequestGenerator {
   public:
     STREAMBenchGenerator_CustomCmd(ComponentId_t id, Params &params);
     void build(Params &params);
-    ~STREAMBenchGenerator_CustomCmd() override;
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-    bool isFinished() override;
-    void completed() override;
+    ~STREAMBenchGenerator_CustomCmd();
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q);
+    bool isFinished();
+    void completed();
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
         STREAMBenchGenerator_CustomCmd, "miranda", "STREAMBenchGeneratorCustomCmd", SST_ELI_ELEMENT_VERSION(1, 0, 0),

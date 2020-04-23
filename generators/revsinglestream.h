@@ -29,10 +29,10 @@ class ReverseSingleStreamGenerator : public RequestGenerator {
   public:
     ReverseSingleStreamGenerator(ComponentId_t id, Params &params);
     void build(Params &params);
-    ~ReverseSingleStreamGenerator() override;
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-    bool isFinished() override;
-    void completed() override;
+    ~ReverseSingleStreamGenerator();
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q);
+    bool isFinished();
+    void completed();
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(ReverseSingleStreamGenerator, "miranda", "ReverseSingleStreamGenerator",
                                           SST_ELI_ELEMENT_VERSION(1, 0, 0),

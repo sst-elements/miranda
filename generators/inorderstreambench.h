@@ -31,7 +31,7 @@ class InOrderSTREAMBenchGenerator : public RequestGenerator {
 
     void build(Params &params) {
 
-        const auto verbose = params.find<uint32_t>("verbose", 0);
+        const uint32_t verbose = params.find<uint32_t>("verbose", 0);
         out = new Output("InOrderSTREAMBench[@p:@l]: ", verbose, 0, Output::STDOUT);
 
         n = params.find<uint64_t>("n", 10000);
@@ -46,16 +46,16 @@ class InOrderSTREAMBenchGenerator : public RequestGenerator {
         i = 0;
     }
 
-    ~InOrderSTREAMBenchGenerator() override { delete out; }
+    ~InOrderSTREAMBenchGenerator() { delete out; }
 
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override {
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) {
         if (i == n) {
             return;
         }
 
-        auto **b_reads = (MemoryOpRequest **)malloc(sizeof(MemoryOpRequest *) * block_per_call);
-        auto **c_reads = (MemoryOpRequest **)malloc(sizeof(MemoryOpRequest *) * block_per_call);
-        auto **a_writes = (MemoryOpRequest **)malloc(sizeof(MemoryOpRequest *) * block_per_call);
+        MemoryOpRequest **b_reads = (MemoryOpRequest **)malloc(sizeof(MemoryOpRequest *) * block_per_call);
+        MemoryOpRequest **c_reads = (MemoryOpRequest **)malloc(sizeof(MemoryOpRequest *) * block_per_call);
+        MemoryOpRequest **a_writes = (MemoryOpRequest **)malloc(sizeof(MemoryOpRequest *) * block_per_call);
 
         for (uint32_t j = 0; j < block_per_call; j++) {
             b_reads[j] = new MemoryOpRequest(start_b + ((i + j) * requestLen), requestLen, READ);
@@ -84,9 +84,9 @@ class InOrderSTREAMBenchGenerator : public RequestGenerator {
         i += block_per_call;
     }
 
-    bool isFinished() override { return i == n; }
+    bool isFinished() { return i == n; }
 
-    void completed() override {}
+    void completed() {}
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(InOrderSTREAMBenchGenerator, "miranda", "InOrderSTREAMBenchGenerator",
                                           SST_ELI_ELEMENT_VERSION(1, 0, 0),

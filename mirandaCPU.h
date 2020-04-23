@@ -51,8 +51,8 @@ class CPURequest {
 class RequestGenCPU : public SST::Component {
   public:
     RequestGenCPU(SST::ComponentId_t id, SST::Params &params);
-    void finish() override;
-    void init(unsigned int phase) override;
+    void finish();
+    void init(unsigned int phase);
 
     SST_ELI_REGISTER_COMPONENT(RequestGenCPU, "miranda", "BaseCPU", SST_ELI_ELEMENT_VERSION(1, 0, 0),
                                "Creates a base Miranda CPU ready to execute an address generator/access pattern",
@@ -105,10 +105,10 @@ class RequestGenCPU : public SST::Component {
                                          "SST::Interfaces::SimpleMem"})
 
   private:
-    RequestGenCPU() = delete;                       // for serialization only
-    RequestGenCPU(const RequestGenCPU &) = delete;  // do not implement
-    void operator=(const RequestGenCPU &) = delete; // do not implement
-    ~RequestGenCPU() override;
+    RequestGenCPU();                       // for serialization only
+    RequestGenCPU(const RequestGenCPU &);  // do not implement
+    void operator=(const RequestGenCPU &); // do not implement
+    ~RequestGenCPU();
 
     void loadGenerator(MirandaReqEvent *);
     void loadGenerator(const std::string &name, SST::Params &params);

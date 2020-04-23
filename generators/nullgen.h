@@ -30,10 +30,10 @@ class EmptyGenerator : public RequestGenerator {
 
   public:
     EmptyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) {}
-    ~EmptyGenerator() override = default;
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override {}
-    bool isFinished() override { return true; }
-    void completed() override {}
+    ~EmptyGenerator() {}
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
+    bool isFinished() { return true; }
+    void completed() {}
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(EmptyGenerator, "miranda", "EmptyGenerator", SST_ELI_ELEMENT_VERSION(1, 0, 0),
                                           "Creates an empty (null) generator", SST::Miranda::RequestGenerator)

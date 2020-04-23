@@ -41,7 +41,7 @@ class MirandaMemoryManager {
                         pageSize, pageCount, maxMemoryAddress);
 
         if (mapRegion->getLocalShareID() == 0) { // First sharer, we're in charge
-            auto *pageArr = (uint64_t *)malloc(pageCount * sizeof(uint64_t));
+            uint64_t *pageArr = (uint64_t *)malloc(pageCount * sizeof(uint64_t));
             // Allocate pages into their standard linear mapping scheme
             for (uint64_t i = 0; i < pageCount; ++i) {
                 pageArr[i] = i * pageSize;

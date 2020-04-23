@@ -27,11 +27,11 @@
 #include "mmu.h"
 #include "remote_bitbang.h"
 #include "sim.h"
-#include <cstdio>
-#include <cstdlib>
 #include <dlfcn.h>
 #include <fesvr/option_parser.h>
 #include <memory>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 
@@ -43,10 +43,10 @@ class Stake : public RequestGenerator {
   public:
     Stake(ComponentId_t id, Params &params);
     void build(Params &params); // Temporary while legacy constructor is getting deprecated
-    ~Stake() override;
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override;
-    bool isFinished() override;
-    void completed() override;
+    ~Stake();
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q);
+    bool isFinished();
+    void completed();
 
     void StakeRequest(uint64_t addr, uint32_t RegLen, bool Read, bool Write, bool Atomic, bool Custom, uint32_t Code);
 

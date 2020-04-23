@@ -30,7 +30,7 @@ class CopyGenerator : public RequestGenerator {
     CopyGenerator(ComponentId_t id, Params &params) : RequestGenerator(id, params) { build(params); }
 
     void build(Params &params) {
-        const auto verbose = params.find<uint32_t>("verbose", 0);
+        const uint32_t verbose = params.find<uint32_t>("verbose", 0);
         out = new Output("CopyGenerator[@p:@l]: ", verbose, 0, Output::STDOUT);
 
         readAddr = params.find<uint64_t>("read_start_address", 0);
@@ -52,16 +52,16 @@ class CopyGenerator : public RequestGenerator {
         out->verbose(CALL_INFO, 1, 0, "N-per-generate     %" PRIu64 "\n", n_per_call);
     }
 
-    ~CopyGenerator() override { delete out; }
+    ~CopyGenerator() { delete out; }
 
-    void generate(MirandaRequestQueue<GeneratorRequest *> *q) override {
+    void generate(MirandaRequestQueue<GeneratorRequest *> *q) {
         for (int i = 0; i < n_per_call; i++) {
             if (nextItem == itemCount) {
                 return;
             }
 
-            auto *read = new MemoryOpRequest(readAddr + (nextItem * reqLength), reqLength, READ);
-            auto *write = new MemoryOpRequest(writeAddr + (nextItem * reqLength), reqLength, WRITE);
+            MemoryOpRequest *read = new MemoryOpRequest(readAddr + (nextItem * reqLength), reqLength, READ);
+            MemoryOpRequest *write = new MemoryOpRequest(writeAddr + (nextItem * reqLength), reqLength, WRITE);
             write->addDependency(read->getRequestID());
             q->push_back(read);
             q->push_back(write);
@@ -70,9 +70,9 @@ class CopyGenerator : public RequestGenerator {
         }
     }
 
-    bool isFinished() override { return (nextItem == itemCount); }
+    bool isFinished() { return (nextItem == itemCount); }
 
-    void completed() override {}
+    void completed() {}
 
     SST_ELI_REGISTER_SUBCOMPONENT_DERIVED(
         CopyGenerator, "miranda", "CopyGenerator", SST_ELI_ELEMENT_VERSION(1, 0, 0),

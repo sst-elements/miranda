@@ -16,10 +16,10 @@
 #ifndef _H_SST_MEM_H_REQUEST_GEN
 #define _H_SST_MEM_H_REQUEST_GEN
 
-#include <cstdint>
 #include <sst/core/component.h>
 #include <sst/core/output.h>
 #include <sst/core/subcomponent.h>
+#include <stdint.h>
 
 #include <queue>
 
@@ -32,7 +32,7 @@ class GeneratorRequest {
   public:
     GeneratorRequest() { reqID = nextGeneratorRequestID++; }
 
-    virtual ~GeneratorRequest() = default;
+    virtual ~GeneratorRequest() {}
     virtual ReqOperation getOperation() const = 0;
     uint64_t getRequestID() const { return reqID; }
 
@@ -81,7 +81,7 @@ template <typename QueueType> class MirandaRequestQueue {
         //		printf("Resizing MirandaQueue from: %" PRIu32 " to %" PRIu32 "\n",
         //			curSize, newSize);
 
-        auto *newQ = (QueueType *)malloc(sizeof(QueueType) * newSize);
+        QueueType *newQ = (QueueType *)malloc(sizeof(QueueType) * newSize);
         for (uint32_t i = 0; i < curSize; ++i) {
             newQ[i] = theQ[i];
         }
@@ -103,7 +103,7 @@ template <typename QueueType> class MirandaRequestQueue {
             return;
         }
 
-        auto *newQ = (QueueType *)malloc(sizeof(QueueType) * maxCapacity);
+        QueueType *newQ = (QueueType *)malloc(sizeof(QueueType) * maxCapacity);
 
         uint32_t nextSkipIndex = 0;
         uint32_t nextSkip = eraseList.at(nextSkipIndex);
@@ -149,8 +149,8 @@ class MemoryOpRequest : public GeneratorRequest {
   public:
     MemoryOpRequest(const uint64_t cAddr, const uint64_t cLength, const ReqOperation cOpType)
         : GeneratorRequest(), addr(cAddr), length(cLength), op(cOpType) {}
-    ~MemoryOpRequest() override = default;
-    ReqOperation getOperation() const override { return op; }
+    ~MemoryOpRequest() {}
+    ReqOperation getOperation() const { return op; }
     bool isRead() const { return op == READ; }
     bool isWrite() const { return op == WRITE; }
     bool isCustom() const { return op == CUSTOM; }
@@ -169,7 +169,7 @@ class CustomOpRequest : public MemoryOpRequest {
         : MemoryOpRequest(cAddr, cLength, CUSTOM) {
         opcode = cOpcode;
     }
-    ~CustomOpRequest() override = default;
+    ~CustomOpRequest() {}
     uint32_t getOpcode() const { return opcode; }
 
   protected:
@@ -179,8 +179,8 @@ class CustomOpRequest : public MemoryOpRequest {
 class FenceOpRequest : public GeneratorRequest {
   public:
     FenceOpRequest() : GeneratorRequest() {}
-    ~FenceOpRequest() override = default;
-    ReqOperation getOperation() const override { return REQ_FENCE; }
+    ~FenceOpRequest() {}
+    ReqOperation getOperation() const { return REQ_FENCE; }
 };
 
 class RequestGenerator : public SubComponent {
@@ -188,8 +188,8 @@ class RequestGenerator : public SubComponent {
   public:
     SST_ELI_REGISTER_SUBCOMPONENT_API(SST::Miranda::RequestGenerator)
 
-    RequestGenerator(ComponentId_t id, Params & /*params*/) : SubComponent(id) {}
-    ~RequestGenerator() override = default;
+    RequestGenerator(ComponentId_t id, Params &params) : SubComponent(id) {}
+    ~RequestGenerator() {}
     virtual void generate(MirandaRequestQueue<GeneratorRequest *> *q) {}
     virtual bool isFinished() { return true; }
     virtual void completed() {}
